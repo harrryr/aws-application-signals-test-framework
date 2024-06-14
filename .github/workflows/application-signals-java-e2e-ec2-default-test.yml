@@ -38,9 +38,9 @@ jobs:
     container:
       image: public.ecr.aws/e2l5l6g6/framework-test:latest
     steps:
-#      - uses: actions/checkout@v4
-#        with:
-#          fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Generate testing id
         run: echo TESTING_ID="${{ github.job }}-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}" >> $GITHUB_ENV
@@ -58,7 +58,7 @@ jobs:
 #          cleanup: "rm -rf .terraform && rm -rf .terraform.lock.hcl"
 
       - name: Deploy sample app via terraform and wait for endpoint to come online
-        working-directory: terraform/java/ec2/default
+        working-directory: ../terraform/java/ec2/default
         run: |
           # Attempt to deploy the sample app on an EC2 instance and wait for its endpoint to come online.
           # There may be occasional failures due to transitivity issues, so try up to 2 times.
