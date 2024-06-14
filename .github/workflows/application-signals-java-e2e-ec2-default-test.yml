@@ -30,12 +30,13 @@ env:
   GET_ADOT_JAR_COMMAND: "wget -O adot.jar https://github.com/aws-observability/aws-otel-java-instrumentation/releases/latest/download/aws-opentelemetry-agent.jar"
   GET_CW_AGENT_RPM_COMMAND: "wget -O cw-agent.rpm https://amazoncloudwatch-agent-${{ inputs.aws-region }}.s3.${{ inputs.aws-region }}.amazonaws.com/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm"
   TEST_RESOURCES_FOLDER: /__w/aws-application-signals-test-framework/aws-application-signals-test-framework
+  ACCOUNT_ID: 612966150583
 
 jobs:
   e2e-ec2-default-test:
     runs-on: ubuntu-latest
     container:
-      image: public.ecr.aws/h6o3z5z9/aws-application-signals-test-framework-workflow-container:latest
+      image: public.ecr.aws/e2l5l6g6/framework-test:latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -47,26 +48,14 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.E2E_SECRET_TEST_ROLE_ARN }}
-          aws-region: us-east-1
-
-      - name: Retrieve account
-        uses: aws-actions/aws-secretsmanager-get-secrets@v1
-        with:
-          secret-ids:
-            ACCOUNT_ID, region-account/${{ inputs.aws-region }}
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::${{ env.ACCOUNT_ID }}:role/${{ secrets.E2E_TEST_ROLE_ARN }}
+          role-to-assume: arn:aws:iam::612966150583:role/E2E-Test-Role
           aws-region: ${{ inputs.aws-region }}
 
-      - name: Initiate Terraform
-        uses: ./.github/workflows/actions/execute_and_retry
-        with:
-          command: "cd ${{ env.TEST_RESOURCES_FOLDER }}/terraform/java/ec2/default && terraform init && terraform validate"
-          cleanup: "rm -rf .terraform && rm -rf .terraform.lock.hcl"
+#      - name: Initiate Terraform
+#        uses: ./.github/workflows/actions/execute_and_retry
+#        with:
+#          command: "cd ${{ env.TEST_RESOURCES_FOLDER }}/terraform/java/ec2/default && terraform init && terraform validate"
+#          cleanup: "rm -rf .terraform && rm -rf .terraform.lock.hcl"
 
       - name: Deploy sample app via terraform and wait for endpoint to come online
         working-directory: terraform/java/ec2/default

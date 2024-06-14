@@ -56,3 +56,6 @@ RUN mkdir -p $GRADLE_USER_HOME
 
 # Copy the Gradle cache from the default location to the custom location
 RUN cp -r ~/.gradle/* $GRADLE_USER_HOME
+
+COPY terraform/ /terraform/
+RUN cd terraform/java/ec2/default && terraform init && terraform validate
