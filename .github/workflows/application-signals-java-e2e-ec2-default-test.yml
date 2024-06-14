@@ -57,6 +57,16 @@ jobs:
 #          command: "cd ${{ env.TEST_RESOURCES_FOLDER }}/terraform/java/ec2/default && terraform init && terraform validate"
 #          cleanup: "rm -rf .terraform && rm -rf .terraform.lock.hcl"
 
+      - name: test
+        run: |
+          pwd
+          echo "----------"
+          cd /__w
+          ls
+          echo "----------"
+          cd /__w/aws-application-signals-test-framework
+          ls
+
       - name: Deploy sample app via terraform and wait for endpoint to come online
         working-directory: /__w/terraform/java/ec2/default
         run: |
