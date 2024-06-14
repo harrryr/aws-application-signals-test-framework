@@ -38,9 +38,9 @@ jobs:
     container:
       image: public.ecr.aws/e2l5l6g6/framework-test:latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+#      - uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0
 
       - name: Generate testing id
         run: echo TESTING_ID="${{ github.job }}-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}" >> $GITHUB_ENV
