@@ -66,6 +66,9 @@ jobs:
           echo "----------"
           cd /__w/aws-application-signals-test-framework
           ls
+          echo "----------"
+          cd /
+          ls
 
       - name: Deploy sample app via terraform and wait for endpoint to come online
         working-directory: /__w/terraform/java/ec2/default
