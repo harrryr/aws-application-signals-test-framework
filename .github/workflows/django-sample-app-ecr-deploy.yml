@@ -35,7 +35,7 @@ jobs:
         uses: aws-actions/aws-secretsmanager-get-secrets@v1
         with:
           secret-ids: |
-            ACCOUNT_ID, region-account/${{ env.E2E_TEST_AWS_REGION }}
+            ACCOUNT_ID, region-account/us-east-1
 
       # If the workflow is running as a canary, then we want to log in to the aws account in the appropriate region
       - name: Configure AWS Credentials
@@ -43,7 +43,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::${{ env.ACCOUNT_ID }}:role/${{ env.E2E_TEST_ROLE_NAME }}
-          aws-region: ${{ env.E2E_TEST_AWS_REGION }}
+          aws-region: us-east-1
 
       - name: Login to Amazon ECR
         id: login-ecr
