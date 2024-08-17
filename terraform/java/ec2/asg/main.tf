@@ -43,6 +43,11 @@ resource "aws_key_pair" "aws_ssh_key" {
   public_key = tls_private_key.ssh_key.public_key_openssh
 }
 
+output "private_key_pem" {
+  value     = tls_private_key.ssh_key.private_key_pem
+  sensitive = true
+}
+
 locals {
   ssh_key_name        = aws_key_pair.aws_ssh_key.key_name
   private_key_content = tls_private_key.ssh_key.private_key_pem

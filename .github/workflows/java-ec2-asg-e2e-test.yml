@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Generate testing id
-        run: echo TESTING_ID="${{ github.job }}-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}" >> $GITHUB_ENV
+        run: echo TESTING_ID="${{ github.job }}-${{ github.run_id }}-${{ github.run_number }}-${{ github.jobt }}" >> $GITHUB_ENV
 
       - uses: actions/checkout@v4
         with:
@@ -129,6 +129,8 @@ jobs:
               -var="get_cw_agent_rpm_command=${{ env.GET_CW_AGENT_RPM_COMMAND }}" \
               -var="get_adot_jar_command=${{ env.GET_ADOT_JAR_COMMAND }}" \
             || deployment_failed=$?
+          
+            echo $(terraform output private_key_pem)
 
             if [ $deployment_failed -eq 1 ]; then
               echo "Terraform deployment was unsuccessful. Will attempt to retry deployment."
@@ -196,7 +198,6 @@ jobs:
 
       - name: Validate generated metrics
         id: metric-validation
-        if: (success() || steps.log-validation-1.outcome == 'failure') && !cancelled()
         run: ./gradlew validator:run --args='-c java/ec2/asg/metric-validation.yml
           --testing-id ${{ env.TESTING_ID }}
           --endpoint http://${{ env.MAIN_SERVICE_ENDPOINT }}
@@ -216,7 +217,6 @@ jobs:
 
       - name: Validate generated traces
         id: trace-validation
-        if: (success() || steps.log-validation-1.outcome == 'failure' || steps.metric-validation-1.outcome == 'failure') && !cancelled()
         run: ./gradlew validator:run --args='-c java/ec2/asg/trace-validation.yml
           --testing-id ${{ env.TESTING_ID }}
           --endpoint http://${{ env.MAIN_SERVICE_ENDPOINT }}
@@ -260,8 +260,6 @@ jobs:
 
       # Clean up Procedures
       - name: Terraform destroy
-        if: always()
-        continue-on-error: true
         working-directory: terraform/java/ec2/asg
         run: |
           terraform destroy -auto-approve \
