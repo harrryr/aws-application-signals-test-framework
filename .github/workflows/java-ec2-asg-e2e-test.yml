@@ -255,5 +255,7 @@ jobs:
       - name: Terraform destroy
         working-directory: terraform/java/ec2/asg
         run: |
+          aws autoscaling resume-processes --auto-scaling-group-name ec2-single-asg-${{ env.TESTING_ID }} --scaling-processes Terminate
+          
           terraform destroy -auto-approve \
             -var="test_id=${{ env.TESTING_ID }}"
