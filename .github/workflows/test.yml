@@ -8,6 +8,7 @@
 name: Java EC2 E2E Canary Testing
 on:
   workflow_dispatch:
+  push:
 
 permissions:
   id-token: write

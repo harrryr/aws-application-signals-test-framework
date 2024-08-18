@@ -196,6 +196,7 @@ jobs:
 
       - name: Validate generated metrics
         id: metric-validation
+        if: always()
         run: ./gradlew validator:run --args='-c java/ec2/asg/metric-validation.yml
           --testing-id ${{ env.TESTING_ID }}
           --endpoint http://${{ env.MAIN_SERVICE_ENDPOINT }}
@@ -215,6 +216,7 @@ jobs:
 
       - name: Validate generated traces
         id: trace-validation
+        if: always()
         run: ./gradlew validator:run --args='-c java/ec2/asg/trace-validation.yml
           --testing-id ${{ env.TESTING_ID }}
           --endpoint http://${{ env.MAIN_SERVICE_ENDPOINT }}
