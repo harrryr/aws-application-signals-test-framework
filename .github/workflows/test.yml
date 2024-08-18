@@ -7,7 +7,7 @@
 ## including logs, metrics, and traces.
 name: Java EC2 E2E Canary Testing
 on:
-  push:
+  workflow_dispatch:
 
 permissions:
   id-token: write
