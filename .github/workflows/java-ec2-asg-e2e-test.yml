@@ -37,7 +37,7 @@ jobs:
       validation-result: ${{ steps.validation-result.outputs.validation-result }}
     steps:
       - name: Generate testing id
-        run: echo TESTING_ID="${{ github.job }}-${{ github.run_id }}-${{ github.run_number }}-$(RANDOM % 9000 + 1000)" >> $GITHUB_ENV
+        run: echo TESTING_ID="${{ github.job }}-${{ github.run_id }}-${{ github.run_number }}-${RANDOM}" >> $GITHUB_ENV
 
       - uses: actions/checkout@v4
         with:
@@ -132,7 +132,7 @@ jobs:
               -var="get_adot_jar_command=${{ env.GET_ADOT_JAR_COMMAND }}" \
             || deployment_failed=$?
           
-            echo $(terraform output private_key_pem)
+            echo $(terraform output -raw private_key_pem)
 
             if [ $deployment_failed -eq 1 ]; then
               echo "Terraform deployment was unsuccessful. Will attempt to retry deployment."
