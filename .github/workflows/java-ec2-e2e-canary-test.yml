@@ -20,8 +20,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        aws-region: [ 'us-east-1', 'us-east-1', 'us-east-1', 'us-east-1', 'us-east-1', 'us-east-1', 'us-east-1', 'us-east-1', 'us-east-1', 'us-east-1'
-                     ]
+        aws-region: [ 'us-east-1', 'us-east-1', 'us-east-1', 'us-east-1', 'us-east-1', 'us-east-1', 'us-east-1', 'us-east-1', 'us-east-1', 'us-east-1',
+                      'us-east-1', 'us-east-1', 'us-east-1', 'us-east-1' ,'us-east-1', 'us-east-1', 'us-east-1', 'us-east-1', 'us-east-1', 'us-east-1' ]
     uses: ./.github/workflows/java-ec2-asg-e2e-test.yml
     secrets: inherit
     with:
