@@ -160,7 +160,7 @@ resource "aws_autoscaling_group" "asg" {
   health_check_type = "EC2"
   health_check_grace_period = 60000
 
-  suspend_processes = ["Terminate"]
+  suspended_processes = ["Terminate"]
 }
 
 resource "aws_instance" "remote_service_instance" {
