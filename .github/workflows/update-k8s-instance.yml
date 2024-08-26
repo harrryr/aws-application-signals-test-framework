@@ -93,7 +93,7 @@ jobs:
           aws secretsmanager update-secret --secret-id "${SECRET_NAMES[0]}" --secret-string $master_public_ip
           echo "Done"
           echo $private_key_content
-          aws secretsmanager update-secret --secret-id "${SECRET_NAMES[1]}" --secret-string $master_public_ip
+          aws secretsmanager update-secret --secret-id "${SECRET_NAMES[1]}" --secret-string "$private_key_content"
 
       - name: Run Java K8s Test
         uses: ./.github/workflows/python-k8s-e2e-test.yml
