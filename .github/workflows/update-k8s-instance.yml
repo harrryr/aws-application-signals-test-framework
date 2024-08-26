@@ -60,11 +60,10 @@ jobs:
           for SECRET_NAME in "${SECRET_NAMES[@]}"; do
             echo "Checking secret: $SECRET_NAME"
           
-            aws secretsmanager describe-secret --secret-id $SECRET_NAME --query 'ARN' --output text
-
-            secret_exists=$(aws secretsmanager describe-secret --secret-id $SECRET_NAME --query 'ARN' --output text 2>/dev/null)
+            secret_manager_output=""
+            aws secretsmanager describe-secret --secret-id $SECRET_NAME --query 'ARN' --output text || secret_manager_output=$?
           
-            if [ -z "$secret_exists" ]; then
+            if [[ "$secret_manager_output" == *"Secrets Manager can't find the specified secret."* ]]; then
               echo "Secret does not exist. Creating new secret"
               aws secretsmanager create-secret --name $SECRET_NAME --secret-string ""
             fi
