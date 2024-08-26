@@ -95,13 +95,22 @@ jobs:
           echo $private_key_content
           aws secretsmanager update-secret --secret-id "${SECRET_NAMES[1]}" --secret-string "$private_key_content"
   
-#  run-k8s-test:
-#    uses: ./.github/workflows/k8s-patch-os-jobs.yml
-#    secrets: inherit
-#    with:
-#      repo: ${{ matrix.instance.repo }}
-#      ec2_name: ${{ matrix.instance.ec2_name }}
-#      language: ${{ matrix.instance.language }}
+  run-java-k8s-test:
+    if: ${{ env.LANGUAGE == 'java' }}
+    uses: ./.github/workflows/java-k8s-e2e-test.yml
+    secrets: inherit
+    with:
+      aws-region: 'us-east-1'
+      caller-workflow-name: 'k8s-os-patching'
+
+  run-python-k8s-test:
+    if: ${{ env.LANGUAGE == 'python' }}
+    uses: ./.github/workflows/java-k8s-e2e-test.yml
+    secrets: inherit
+    with:
+      aws-region: 'us-east-1'
+      caller-workflow-name: 'k8s-os-patching'
+
 #
 #  update-secrets:
 #    runs-on: ubuntu-latest
