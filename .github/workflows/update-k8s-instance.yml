@@ -61,12 +61,15 @@ jobs:
             echo "Checking secret: $SECRET_NAME"
           
             secret_manager_output=""
-            aws secretsmanager describe-secret --secret-id $SECRET_NAME --query 'ARN' --output text || secret_manager_output=$?
+            aws secretsmanager describe-secret --secret-id $SECRET_NAME >/dev/null 2>&1
           
-            if [[ "$secret_manager_output" == *"Secrets Manager can't find the specified secret."* ]]; then
+            if [ $? -eq 0 ]; then
+              echo "Success: The secret exists."
+            else
               echo "Secret does not exist. Creating new secret"
               aws secretsmanager create-secret --name $SECRET_NAME --secret-string ""
             fi
+  
           done
           
 
