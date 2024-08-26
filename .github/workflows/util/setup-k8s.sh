@@ -95,22 +95,39 @@ function run_k8s_master() {
     sudo sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/' /etc/containerd/config.toml
     sudo sed -i 's/systemd_cgroup \= true/systemd_cgroup \= true/' /etc/containerd/config.toml
     sudo systemctl restart containerd && sleep 20
+    "echo 17"
     sudo setenforce 0 && sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+    echo "16"
     echo -e "[kubernetes]\nname=Kubernetes\nbaseurl=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/\nenabled=1\ngpgcheck=1\ngpgkey=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/repodata/repomd.xml.key\nexclude=kubelet kubeadm kubectl cri-tools kubernetes-cni" | sudo tee /etc/yum.repos.d/kubernetes.repo
+    echo "15"
     sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+    echo "14"
     sudo systemctl enable --now kubelet && sudo systemctl restart kubelet && sleep 30
+    echo "13"
     sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --apiserver-advertise-address=$master_private_ip --apiserver-cert-extra-sans=$worker_private_ip
+    echo "12"
     mkdir -p \$HOME/.kube
+    echo "11"
     sudo cp -i /etc/kubernetes/admin.conf \$HOME/.kube/config
+    echo "10"
     sudo chown \$(id -u):\$(id -g) \$HOME/.kube/config
+    echo "9"
     sleep 120
+    echo "8"
     curl https://raw.githubusercontent.com/projectcalico/calico/v3.27.2/manifests/calico.yaml -O
+    echo "7"
     kubectl apply -f calico.yaml && sleep 60
+    echo "6"
     sudo cd \$HOME
+    echo "5"
     sudo cp /etc/kubernetes/pki/apiserver.crt apiserver.crt
+    echo "4"
     sudo cp /etc/kubernetes/pki/apiserver.key apiserver.key
+    echo "3"
     sudo chmod +r apiserver.key
+    echo "2"
     sudo kubeadm token create --print-join-command > join-cluster.sh
+    echo "1"
     sudo chmod +x join-cluster.sh
     echo "tlsCertFile: /etc/kubernetes/pki/apiserver.crt" | sudo tee -a /var/lib/kubelet/config.yaml
     echo "tlsPrivateKeyFile: /etc/kubernetes/pki/apiserver.key" | sudo tee -a /var/lib/kubelet/config.yaml
