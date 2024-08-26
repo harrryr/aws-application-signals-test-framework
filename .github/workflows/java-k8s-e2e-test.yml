@@ -52,7 +52,7 @@ jobs:
 
       - uses: actions/checkout@v4
         with:
-          repository: 'aws-observability/aws-application-signals-test-framework'
+          repository: 'harrryr/aws-application-signals-test-framework'
           ref: ${{ env.CALLER_WORKFLOW_NAME == 'main-build' && 'main' || github.ref }}
           fetch-depth: 0
 
@@ -98,8 +98,8 @@ jobs:
         uses: aws-actions/aws-secretsmanager-get-secrets@v1
         with:
           secret-ids: |
-            MAIN_SERVICE_ENDPOINT, e2e-test/${{ github.event.repository.name }}/java-k8s-master-node-endpoint-temporary-update
-            MASTER_NODE_SSH_KEY, e2e-test/${{ github.event.repository.name }}/java-k8s-ssh-key-temporary-update
+            MAIN_SERVICE_ENDPOINT, e2e-test/${{ github.event.repository.name }}/java-k8s-master-node-endpoint-pending-value
+            MASTER_NODE_SSH_KEY, e2e-test/${{ github.event.repository.name }}/java-k8s-ssh-key-pending-value
 
       - name: Prepare and upload sample app deployment files
         working-directory: terraform/java/k8s/deploy/resources

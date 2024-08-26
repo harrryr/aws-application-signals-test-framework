@@ -52,8 +52,8 @@ jobs:
       - name: Check if Secret Key Already Exist and If Not Create New Ones
         run: |
           SECRET_NAMES=(
-            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-master-node-endpoint-temporary-update"
-            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-ssh-key-temporary-update"
+            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-master-node-endpoint-pending-value"
+            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-ssh-key-pending-value"
           )
           
           for SECRET_NAME in "${SECRET_NAMES[@]}"; do
@@ -73,8 +73,8 @@ jobs:
         working-directory: .github/workflows/util
         run: |
           SECRET_NAMES=(
-            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-master-node-endpoint-temporary-update"
-            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-ssh-key-temporary-update"
+            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-master-node-endpoint-pending-value"
+            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-ssh-key-pending-value"
           )
           
           ls
@@ -113,47 +113,44 @@ jobs:
       aws-region: 'us-east-1'
       caller-workflow-name: 'k8s-os-patching'
 
-#
-#  update-secrets:
-#    runs-on: ubuntu-latest
-#    steps:
-#
-#
-#
-#      - name: Check if Secret Key Already Exist and If Not Create New Ones
-#        run: |
-#          SECRET_NAMES=(
-#            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-master-node-endpoint"
-#            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-ssh-key"
-#          )
-#
-#          for SECRET_NAME in "${SECRET_NAMES[@]}"; do
-#            echo "Checking secret: $SECRET_NAME"
-#
-#            secret_exists=$(aws secretsmanager describe-secret --secret-id $SECRET_NAME --query 'ARN' --output text 2>/dev/null)
-#
-#            if [ -z "$secret_exists" ]; then
-#              echo "Secret does not exist. Creating new secret"
-#              aws secretsmanager create-secret --name $SECRET_NAME --secret-string ""
-#            fi
-#          done
-#
-#      - name: Save Private Key and Master Public Endpoint to Secret Manager
-#        working-directory: .github/workflows/util
-#        run: |
-#          SECRET_NAMES=(
-#            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-master-node-endpoint"
-#            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-ssh-key"
-#          )
-#
-#          private_key_file=k8s-on-ec2-${{ env.EC2_NAME }}-key-pair-${{ env.TESTING_ID }}.pem
-#
-#          master_public_ip=$(aws ec2 describe-instances \
-#            --filters "Name=tag:Name,Values=$MASTER_INSTANCE_NAME" "Name=instance-state-name,Values=running" \
-#            --query "Reservations[*].Instances[*].PublicIpAddress" \
-#            --output text)
-#
-#          aws secretsmanager update-secret --secret-id "${SECRET_NAMES[0]}" --secret-string file://$private_key_file
-#          aws secretsmanager update-secret --secret-id "${SECRET_NAMES[1]}" --secret-string file://$master_public_ip
+
+  update-secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if Secret Key Already Exist and If Not Create New Ones
+        run: |
+          SECRET_NAMES=(
+            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-master-node-endpoint"
+            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-ssh-key"
+          )
+
+          for SECRET_NAME in "${SECRET_NAMES[@]}"; do
+            echo "Checking secret: $SECRET_NAME"
+
+            secret_exists=$(aws secretsmanager describe-secret --secret-id $SECRET_NAME --query 'ARN' --output text 2>/dev/null)
+
+            if [ -z "$secret_exists" ]; then
+              echo "Secret does not exist. Creating new secret"
+              aws secretsmanager create-secret --name $SECRET_NAME --secret-string ""
+            fi
+          done
+
+      - name: Save Private Key and Master Public Endpoint to Secret Manager
+        working-directory: .github/workflows/util
+        run: |
+          SECRET_NAMES=(
+            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-master-node-endpoint"
+            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-ssh-key"
+          )
+
+          private_key_file=k8s-on-ec2-${{ env.EC2_NAME }}-key-pair-${{ env.TESTING_ID }}.pem
+
+          master_public_ip=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=$MASTER_INSTANCE_NAME" "Name=instance-state-name,Values=running" \
+            --query "Reservations[*].Instances[*].PublicIpAddress" \
+            --output text)
+
+          aws secretsmanager update-secret --secret-id "${SECRET_NAMES[0]}" --secret-string file://$private_key_file
+          aws secretsmanager update-secret --secret-id "${SECRET_NAMES[1]}" --secret-string file://$master_public_ip
 
 
