@@ -79,16 +79,15 @@ jobs:
           )
           
           private_key_file=k8s-on-ec2-${{ matrix.instance.ec2_name }}-key-pair-${{ env.TESTING_ID }}.pem
-               
-          
+          private_key_content=$(<"$private_key_file")
           
           master_public_ip=$(aws ec2 describe-instances \
             --filters "Name=tag:Name,Values=k8s-on-ec2-${{ matrix.instance.ec2_name }}-${{ matrix.instance.language }}-master-${{ env.TESTING_ID }}" "Name=instance-state-name,Values=running" \
             --query "Reservations[*].Instances[*].PublicIpAddress" \
             --output text)
           
-          echo $master_public_ip
-          aws secretsmanager update-secret --secret-id "${SECRET_NAMES[1]}" --secret-string $master_public_ip
+          aws secretsmanager update-secret --secret-id "${SECRET_NAMES[0]}" --secret-string $master_public_ip
+          aws secretsmanager update-secret --secret-id "${SECRET_NAMES[1]}" --secret-string $private_key_content
 
       - name: Run Java K8s Test
         uses: ./.github/workflows/python-k8s-e2e-test.yml
