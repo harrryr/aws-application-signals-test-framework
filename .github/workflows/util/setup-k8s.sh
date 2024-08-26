@@ -43,27 +43,27 @@ function create_resources() {
       --output text)
 
     aws ec2 create-tags --resources $master_instance_id --tags Key=Name,Value=$MASTER_INSTANCE_NAME Key=k8s-on-ec2-node,Value=true
-#
-#    echo "Creating Worker Instance"
-#    worker_instance_id=$(aws ec2 run-instances \
-#      --image-id $image_id \
-#      --count 1 \
-#      --instance-type m5.xlarge \
-#      --key-name $KEY_NAME \
-#      --security-group-ids $security_group_id \
-#      --iam-instance-profile Name=$INSTANCE_PROFILE \
-#      --associate-public-ip-address \
-#      --block-device-mappings 'DeviceName=/dev/xvda,Ebs={VolumeSize=80,VolumeType=gp3}' \
-#      --metadata-options 'HttpPutResponseHopLimit=3,HttpEndpoint=enabled' \
-#      --query 'Instances[0].InstanceId' \
-#      --output text)
-#
-#    aws ec2 create-tags --resources $worker_instance_id --tags Key=Name,Value=$WORKER_INSTANCE_NAME Key=k8s-on-ec2-node,Value=true
-#
-#    echo "Wait for Master Instance $master_instance_id and Worker Instance $worker_instance_id to be ready"
-#    aws ec2 wait instance-status-ok --instance-ids $master_instance_id
-#    aws ec2 wait instance-status-ok --instance-ids $worker_instance_id
-#    echo "All instances are up and running."
+
+    echo "Creating Worker Instance"
+    worker_instance_id=$(aws ec2 run-instances \
+      --image-id $image_id \
+      --count 1 \
+      --instance-type m5.xlarge \
+      --key-name $KEY_NAME \
+      --security-group-ids $security_group_id \
+      --iam-instance-profile Name=$INSTANCE_PROFILE \
+      --associate-public-ip-address \
+      --block-device-mappings 'DeviceName=/dev/xvda,Ebs={VolumeSize=80,VolumeType=gp3}' \
+      --metadata-options 'HttpPutResponseHopLimit=3,HttpEndpoint=enabled' \
+      --query 'Instances[0].InstanceId' \
+      --output text)
+
+    aws ec2 create-tags --resources $worker_instance_id --tags Key=Name,Value=$WORKER_INSTANCE_NAME Key=k8s-on-ec2-node,Value=true
+
+    echo "Wait for Master Instance $master_instance_id and Worker Instance $worker_instance_id to be ready"
+    aws ec2 wait instance-status-ok --instance-ids $master_instance_id
+    aws ec2 wait instance-status-ok --instance-ids $worker_instance_id
+    echo "All instances are up and running."
 }
 
 
@@ -176,6 +176,6 @@ EOF
 }
 
 create_resources
-#run_k8s_master
-#run_k8s_worker
-#install_helm
+run_k8s_master
+run_k8s_worker
+install_helm
