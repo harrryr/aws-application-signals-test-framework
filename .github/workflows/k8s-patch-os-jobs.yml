@@ -28,76 +28,76 @@ env:
   E2E_TEST_ROLE_NAME: ${{ secrets.APPLICATION_SIGNALS_E2E_TEST_ROLE_NAME }}
 
 jobs:
-  create-k8s-on-ec2:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Generate Testing ID
-        run: |
-          echo TESTING_ID="${{ github.run_id }}-${{ github.run_number }}" >> $GITHUB_ENV
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::${{ env.E2E_TEST_ACCOUNT_ID }}:role/${{ env.E2E_TEST_ROLE_NAME }}
-          aws-region: us-east-1
-
-      - name: Create New K8s on EC2
-        working-directory: .github/workflows/util
-        run: |
-          ./setup-k8s.sh ${{ env.TESTING_ID }} ${{ env.EC2_NAME }}-${{ env.LANGUAGE }} ${{ env.E2E_TEST_AWS_REGION }}
-
-      - name: Check if Secret Key Already Exist and If Not Create New Ones
-        run: |
-          SECRET_NAMES=(
-            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-master-node-endpoint-pending-value"
-            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-ssh-key-pending-value"
-            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-master-node-endpoint"
-            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-ssh-key"
-            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-master-node-endpoint-temporary-storage"
-            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-ssh-key-temporary-storage"
-          )
-          
-          for SECRET_NAME in "${SECRET_NAMES[@]}"; do
-            echo "Checking secret: $SECRET_NAME"
-          
-        
-            if aws secretsmanager describe-secret --secret-id $SECRET_NAME; then
-              echo "Success: The secret exists."
-            else
-              echo "Secret does not exist. Creating new secret"
-              aws secretsmanager create-secret --name $SECRET_NAME --secret-string " "
-            fi
-          done
-      
-
-      - name: Save Private Key and Master Public Endpoint to Secret Manager
-        working-directory: .github/workflows/util
-        run: |
-          SECRET_NAMES=(
-            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-master-node-endpoint-pending-value"
-            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-ssh-key-pending-value"
-          )
-          
-          ls
-          private_key_file=k8s-on-ec2-test-key-pair-test.pem
-          private_key_file=k8s-on-ec2-${{ env.EC2_NAME }}-${{ env.LANGUAGE }}-key-pair-${{ env.TESTING_ID }}.pem
-          private_key_content=$(<"$private_key_file")
-          
-          sleep 10
-          master_public_ip=$(aws ec2 describe-instances \
-            --filters "Name=tag:Name,Values=k8s-on-ec2-${{ env.EC2_NAME }}-${{ env.LANGUAGE }}-master-${{ env.TESTING_ID }}" "Name=instance-state-name,Values=running" \
-            --query "Reservations[*].Instances[*].PublicIpAddress" \
-            --output text)
-          
-          echo $master_public_ip
-          
-          aws secretsmanager update-secret --secret-id "${SECRET_NAMES[0]}" --secret-string $master_public_ip
-          echo "Done"
-          echo $private_key_content
-          aws secretsmanager update-secret --secret-id "${SECRET_NAMES[1]}" --secret-string "$private_key_content"
+#  create-k8s-on-ec2:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Generate Testing ID
+#        run: |
+#          echo TESTING_ID="${{ github.run_id }}-${{ github.run_number }}" >> $GITHUB_ENV
+#
+#      - name: Checkout repository
+#        uses: actions/checkout@v4
+#
+#      - name: Configure AWS Credentials
+#        uses: aws-actions/configure-aws-credentials@v4
+#        with:
+#          role-to-assume: arn:aws:iam::${{ env.E2E_TEST_ACCOUNT_ID }}:role/${{ env.E2E_TEST_ROLE_NAME }}
+#          aws-region: us-east-1
+#
+#      - name: Create New K8s on EC2
+#        working-directory: .github/workflows/util
+#        run: |
+#          ./setup-k8s.sh ${{ env.TESTING_ID }} ${{ env.EC2_NAME }}-${{ env.LANGUAGE }} ${{ env.E2E_TEST_AWS_REGION }}
+#
+#      - name: Check if Secret Key Already Exist and If Not Create New Ones
+#        run: |
+#          SECRET_NAMES=(
+#            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-master-node-endpoint-pending-value"
+#            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-ssh-key-pending-value"
+#            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-master-node-endpoint"
+#            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-ssh-key"
+#            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-master-node-endpoint-temporary-storage"
+#            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-ssh-key-temporary-storage"
+#          )
+#
+#          for SECRET_NAME in "${SECRET_NAMES[@]}"; do
+#            echo "Checking secret: $SECRET_NAME"
+#
+#
+#            if aws secretsmanager describe-secret --secret-id $SECRET_NAME; then
+#              echo "Success: The secret exists."
+#            else
+#              echo "Secret does not exist. Creating new secret"
+#              aws secretsmanager create-secret --name $SECRET_NAME --secret-string " "
+#            fi
+#          done
+#
+#
+#      - name: Save Private Key and Master Public Endpoint to Secret Manager
+#        working-directory: .github/workflows/util
+#        run: |
+#          SECRET_NAMES=(
+#            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-master-node-endpoint-pending-value"
+#            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-ssh-key-pending-value"
+#          )
+#
+#          ls
+#          private_key_file=k8s-on-ec2-test-key-pair-test.pem
+#          private_key_file=k8s-on-ec2-${{ env.EC2_NAME }}-${{ env.LANGUAGE }}-key-pair-${{ env.TESTING_ID }}.pem
+#          private_key_content=$(<"$private_key_file")
+#
+#          sleep 10
+#          master_public_ip=$(aws ec2 describe-instances \
+#            --filters "Name=tag:Name,Values=k8s-on-ec2-${{ env.EC2_NAME }}-${{ env.LANGUAGE }}-master-${{ env.TESTING_ID }}" "Name=instance-state-name,Values=running" \
+#            --query "Reservations[*].Instances[*].PublicIpAddress" \
+#            --output text)
+#
+#          echo $master_public_ip
+#
+#          aws secretsmanager update-secret --secret-id "${SECRET_NAMES[0]}" --secret-string $master_public_ip
+#          echo "Done"
+#          echo $private_key_content
+#          aws secretsmanager update-secret --secret-id "${SECRET_NAMES[1]}" --secret-string "$private_key_content"
   
   run-java-k8s-test:
     if: ${{ inputs.LANGUAGE == 'java' }}
@@ -119,8 +119,15 @@ jobs:
 
   update-secrets:
     needs: [ run-java-k8s-test, run-python-k8s-test ]
+    if: ${{ always() }} && (needs.run-java-k8s-test.result == 'success' || needs.run-python-k8s-test.result == 'success')
     runs-on: ubuntu-latest
     steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ env.E2E_TEST_ACCOUNT_ID }}:role/${{ env.E2E_TEST_ROLE_NAME }}
+          aws-region: us-east-1
+
       - name: Copy the current endpoint and ssh key to storage
         run: |         
           STORAGE_SECRET_KEYS=(
@@ -155,19 +162,5 @@ jobs:
           ssh_secret=$(aws secretsmanager get-secret-value --secret-id "${PENDING_SECRET_KEYS[1]}" --query SecretString --output text)
 
           aws secretsmanager update-secret --secret-id "${CURRENT_SECRET_KEYS[0]}" --secret-string $endpoint_secret
-          aws secretsmanager update-secret --secret-id "${CURRENT_SECRET_KEYS[1]}" --secret-string $ssh_secret
-
-  wait-5-hours:
-    needs: update-secrets
-    runs-on: ubuntu-latest
-    steps:
-      - name: Wait 5 hours
-        run: sleep 18000
-
-  clean-up-old-k8s:
-    needs: wait-5-hours
-    runs-on: ubuntu-latest
-    steps:
-      - name: Run script to clean up old k8s resources
-        working-directory: .github/workflows/util
-        run: ./cleanup-k8s.sh ${{ env.TESTING_ID }} ${{ env.EC2_NAME }}-${{ env.LANGUAGE }} ${{ env.E2E_TEST_AWS_REGION }}
+          aws secretsmanager update-secret --secret-id "${CURRENT_SECRET_KEYS[1]}" --secret-string $ssh_secret          
+          
