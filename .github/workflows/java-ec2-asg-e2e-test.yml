@@ -22,8 +22,8 @@ permissions:
 env:
   E2E_TEST_AWS_REGION: ${{ inputs.aws-region }}
   CALLER_WORKFLOW_NAME: ${{ inputs.caller-workflow-name }}
-  SAMPLE_APP_FRONTEND_SERVICE_JAR: s3://aws-appsignals-sample-app-prod-${{ inputs.aws-region }}-2/main-service.jar
-  SAMPLE_APP_REMOTE_SERVICE_JAR: s3://aws-appsignals-sample-app-prod-${{ inputs.aws-region }}-2/remote-service.jar
+  SAMPLE_APP_FRONTEND_SERVICE_JAR: s3://aws-appsignals-sample-app-prod-${{ inputs.aws-region }}/main-service.jar
+  SAMPLE_APP_REMOTE_SERVICE_JAR: s3://aws-appsignals-sample-app-prod-${{ inputs.aws-region }}/remote-service.jar
   E2E_TEST_ACCOUNT_ID: ${{ secrets.APPLICATION_SIGNALS_E2E_TEST_ACCOUNT_ID }}
   E2E_TEST_ROLE_NAME: ${{ secrets.APPLICATION_SIGNALS_E2E_TEST_ROLE_NAME }}
   METRIC_NAMESPACE: ApplicationSignals
@@ -37,9 +37,13 @@ jobs:
       validation-result: ${{ steps.validation-result.outputs.validation-result }}
     steps:
       - name: Generate testing id
-        run: echo TESTING_ID="${{ github.job }}-${{ github.run_id }}-${{ github.run_number }}-${RANDOM}" >> $GITHUB_ENV
+        run: echo TESTING_ID="${{ github.job }}-${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}}" >> $GITHUB_ENV
 
       - uses: actions/checkout@v4
+        with:
+          repository: 'aws-observability/aws-application-signals-test-framework'
+          ref: ${{ env.CALLER_WORKFLOW_NAME == 'main-build' && 'main' || github.ref }}
+          fetch-depth: 0
 
       # We initialize Gradlew Daemon early on during the workflow because sometimes initialization
       # fails due to transient issues. If it fails here, then we will try again later before the validators
@@ -196,7 +200,7 @@ jobs:
 
       - name: Validate generated metrics
         id: metric-validation
-        if: always()
+        if: (success() || steps.log-validation.outcome == 'failure') && !cancelled()
         run: ./gradlew validator:run --args='-c java/ec2/asg/metric-validation.yml
           --testing-id ${{ env.TESTING_ID }}
           --endpoint http://${{ env.MAIN_SERVICE_ENDPOINT }}
@@ -216,7 +220,7 @@ jobs:
 
       - name: Validate generated traces
         id: trace-validation
-        if: always()
+        if: (success() || steps.log-validation.outcome == 'failure' || steps.metric-validation.outcome == 'failure') && !cancelled()
         run: ./gradlew validator:run --args='-c java/ec2/asg/trace-validation.yml
           --testing-id ${{ env.TESTING_ID }}
           --endpoint http://${{ env.MAIN_SERVICE_ENDPOINT }}
@@ -253,9 +257,21 @@ jobs:
 
       # Clean up Procedures
       - name: Terraform destroy
+        if: always()
+        continue-on-error: true
         working-directory: terraform/java/ec2/asg
         run: |
           aws autoscaling resume-processes --auto-scaling-group-name ec2-single-asg-${{ env.TESTING_ID }} --scaling-processes Terminate
           
           terraform destroy -auto-approve \
             -var="test_id=${{ env.TESTING_ID }}"
+
+  emit-metric:
+    needs: java-ec2-asg
+    if: always()
+    uses: ./.github/workflows/e2e-test-publish-result.yml
+    secrets: inherit
+    with:
+      aws-region: ${{ inputs.aws-region }}
+      caller-workflow-name: ${{ inputs.caller-workflow-name }}
+      validation-result: ${{ needs.java-ec2-asg.outputs.validation-result }}

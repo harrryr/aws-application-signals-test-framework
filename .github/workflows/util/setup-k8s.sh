@@ -173,7 +173,7 @@ function run_k8s_worker() {
     echo "9"
     echo -e "[kubernetes]\nname=Kubernetes\nbaseurl=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/\nenabled=1\ngpgcheck=1\ngpgkey=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/repodata/repomd.xml.key\nexclude=kubelet kubeadm kubectl cri-tools kubernetes-cni" | sudo tee /etc/yum.repos.d/kubernetes.repo
     echo "10"
-    sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+    sudo yum install -y kubelet kubeadm kubectl --disable excludes=kubernetes
     echo "11"
     sudo mkdir -p /etc/kubernetes/pki/
     echo "12"

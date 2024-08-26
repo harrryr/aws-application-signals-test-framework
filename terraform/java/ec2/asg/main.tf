@@ -43,11 +43,6 @@ resource "aws_key_pair" "aws_ssh_key" {
   public_key = tls_private_key.ssh_key.public_key_openssh
 }
 
-output "private_key_pem" {
-  value     = tls_private_key.ssh_key.private_key_pem
-  sensitive = true
-}
-
 locals {
   ssh_key_name        = aws_key_pair.aws_ssh_key.key_name
   private_key_content = tls_private_key.ssh_key.private_key_pem
@@ -136,7 +131,7 @@ resource "aws_launch_configuration" "launch_configuration" {
     sudo yum install nodejs aws-cli unzip tmux -y
 
     # Bring in the traffic generator files to EC2 Instance
-    aws s3 cp s3://aws-appsignals-sample-app-prod-${var.aws_region}-2/traffic-generator.zip ./traffic-generator.zip
+    aws s3 cp s3://aws-appsignals-sample-app-prod-${var.aws_region}/traffic-generator.zip ./traffic-generator.zip
     unzip ./traffic-generator.zip -d ./
 
     # Install the traffic generator dependencies
@@ -158,9 +153,6 @@ resource "aws_autoscaling_group" "asg" {
   launch_configuration = aws_launch_configuration.launch_configuration.name
   vpc_zone_identifier = [data.aws_subnets.default_subnets.ids.0]
   health_check_type = "EC2"
-  health_check_grace_period = 60000
-
-  suspended_processes = ["Terminate"]
 }
 
 resource "aws_instance" "remote_service_instance" {
