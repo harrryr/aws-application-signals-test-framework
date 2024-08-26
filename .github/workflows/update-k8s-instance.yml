@@ -3,9 +3,10 @@
 name: Update K8s EC2 Instance
 
 on:
-  schedule:
-    - cron: '0 0 1 * *' # run the workflow beginning of every month
-  workflow_dispatch: # be able to run the workflow on demand
+#  schedule:
+#    - cron: '0 0 1 * *' # run the workflow beginning of every month
+#  workflow_dispatch: # be able to run the workflow on demand
+  push:
 
 permissions:
   id-token: write
@@ -101,8 +102,10 @@ jobs:
                     { repo: 'aws-application-signals-test-framework', ec2_name: 'e2e-playground', language: 'all' } ]
     steps:
       - name: Run Java K8s Test
-        uses: ./.github/workflows/reusable-workflow.yml
+        uses: ./.github/workflows/python-k8s-e2e-test.yml
+        secrets: inherit
         with:
-          # Pass inputs if your reusable workflow requires any
-          some-input: "value"
+          # To run in more regions, a cluster must be provisioned manually on EC2 instances in that region
+          aws-region: 'us-east-1'
+          caller-workflow-name: 'appsignals-e2e-python-k8s-canary-test'
 
