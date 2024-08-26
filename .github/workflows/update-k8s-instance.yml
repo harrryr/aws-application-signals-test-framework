@@ -59,6 +59,8 @@ jobs:
           
           for SECRET_NAME in "${SECRET_NAMES[@]}"; do
             echo "Checking secret: $SECRET_NAME"
+          
+            aws secretsmanager describe-secret --secret-id $SECRET_NAME --query 'ARN' --output text
 
             secret_exists=$(aws secretsmanager describe-secret --secret-id $SECRET_NAME --query 'ARN' --output text 2>/dev/null)
           
