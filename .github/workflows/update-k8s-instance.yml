@@ -80,7 +80,7 @@ jobs:
           
           ls
           
-          private_key_file=k8s-on-ec2-${{ matrix.instance.ec2_name }}-key-pair-${{ env.TESTING_ID }}.pem
+          private_key_file=k8s-on-ec2-${{ matrix.instance.ec2_name }}-${{ matrix.instance.language }}-key-pair-${{ env.TESTING_ID }}.pem
           private_key_content=$(<"$private_key_file")
           
           master_public_ip=$(aws ec2 describe-instances \
