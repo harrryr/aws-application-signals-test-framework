@@ -4,7 +4,7 @@ name: Update K8s EC2 Instance
 
 on:
   workflow_call:
-    env:
+    inputs:
       repo:
         required: true
         type: string
