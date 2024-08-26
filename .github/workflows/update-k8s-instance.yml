@@ -45,10 +45,10 @@ jobs:
           role-to-assume: arn:aws:iam::${{ env.E2E_TEST_ACCOUNT_ID }}:role/${{ env.E2E_TEST_ROLE_NAME }}
           aws-region: us-east-1
 
-      - name: Create New K8s on EC2
-        working-directory: .github/workflows/util
-        run: |
-          ./setup-k8s.sh ${{ env.TESTING_ID }} ${{ matrix.instance.ec2_name }}-${{ matrix.instance.language }} ${{ env.E2E_TEST_AWS_REGION }}
+#      - name: Create New K8s on EC2
+#        working-directory: .github/workflows/util
+#        run: |
+#          ./setup-k8s.sh ${{ env.TESTING_ID }} ${{ matrix.instance.ec2_name }}-${{ matrix.instance.language }} ${{ env.E2E_TEST_AWS_REGION }}
 
       - name: Check if Secret Key Already Exist and If Not Create New Ones
         run: |
