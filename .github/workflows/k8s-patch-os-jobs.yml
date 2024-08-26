@@ -28,13 +28,13 @@ env:
   E2E_TEST_ROLE_NAME: ${{ secrets.APPLICATION_SIGNALS_E2E_TEST_ROLE_NAME }}
 
 jobs:
-#  create-k8s-on-ec2:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Generate Testing ID
-#        run: |
-#          echo TESTING_ID="${{ github.run_id }}-${{ github.run_number }}" >> $GITHUB_ENV
-#
+  create-k8s-on-ec2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Testing ID
+        run: |
+          echo TESTING_ID="${{ github.run_id }}-${{ github.run_number }}" >> $GITHUB_ENV
+
 #      - name: Checkout repository
 #        uses: actions/checkout@v4
 #
