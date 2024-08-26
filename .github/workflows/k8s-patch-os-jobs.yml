@@ -82,6 +82,7 @@ jobs:
           private_key_file=k8s-on-ec2-${{ env.EC2_NAME }}-${{ env.LANGUAGE }}-key-pair-${{ env.TESTING_ID }}.pem
           private_key_content=$(<"$private_key_file")
           
+          sleep 10
           master_public_ip=$(aws ec2 describe-instances \
             --filters "Name=tag:Name,Values=k8s-on-ec2-${{ env.EC2_NAME }}-${{ env.LANGUAGE }}-master-${{ env.TESTING_ID }}" "Name=instance-state-name,Values=running" \
             --query "Reservations[*].Instances[*].PublicIpAddress" \
@@ -94,14 +95,19 @@ jobs:
           echo $private_key_content
           aws secretsmanager update-secret --secret-id "${SECRET_NAMES[1]}" --secret-string "$private_key_content"
   
-  
+  run-k8s-test:
+    uses: ./.github/workflows/k8s-patch-os-jobs.yml
+    secrets: inherit
+    with:
+      repo: ${{ matrix.instance.repo }}
+      ec2_name: ${{ matrix.instance.ec2_name }}
+      language: ${{ matrix.instance.language }}
 
-      - name: Run Java K8s Test
-        uses: ./.github/workflows/python-k8s-e2e-test.yml
-        with:
-          # To run in more regions, a cluster must be provisioned manually on EC2 instances in that region
-          aws-region: 'us-east-1'
-          caller-workflow-name: 'appsignals-e2e-python-k8s-canary-test'
+  update-secrets:
+    runs-on: ubuntu-latest
+    steps:
+
+
 
       - name: Check if Secret Key Already Exist and If Not Create New Ones
         run: |
