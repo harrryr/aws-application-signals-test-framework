@@ -30,9 +30,6 @@ env:
 jobs:
   create-k8s-on-ec2:
     runs-on: ubuntu-latest
-    concurrency:
-      group: k8s-patch-os
-      cancel-in-progress: false
     steps:
       - name: Generate Testing ID
         run: |
