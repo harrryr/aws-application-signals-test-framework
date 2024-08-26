@@ -78,6 +78,8 @@ jobs:
             "e2e-test/${{ matrix.instance.repo }}/${{ matrix.instance.language }}-k8s-ssh-key-temporary-update"
           )
           
+          ls
+          
           private_key_file=k8s-on-ec2-${{ matrix.instance.ec2_name }}-key-pair-${{ env.TESTING_ID }}.pem
           private_key_content=$(<"$private_key_file")
           
