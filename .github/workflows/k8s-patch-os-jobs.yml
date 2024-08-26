@@ -68,7 +68,7 @@ jobs:
               echo "Success: The secret exists."
             else
               echo "Secret does not exist. Creating new secret"
-              aws secretsmanager create-secret --name $SECRET_NAME --secret-string " "
+              aws secretsmanager create-secret --name $SECRET_NAME --secret-string "empty"
             fi
           done
 
