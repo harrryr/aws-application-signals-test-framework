@@ -96,7 +96,7 @@ jobs:
           aws secretsmanager update-secret --secret-id "${SECRET_NAMES[1]}" --secret-string "$private_key_content"
   
   run-java-k8s-test:
-    if: ${{ env.LANGUAGE == 'java' }}
+    if: ${{ inputs.LANGUAGE == 'java' }}
     uses: ./.github/workflows/java-k8s-e2e-test.yml
     secrets: inherit
     with:
@@ -104,7 +104,7 @@ jobs:
       caller-workflow-name: 'k8s-os-patching'
 
   run-python-k8s-test:
-    if: ${{ env.LANGUAGE == 'python' }}
+    if: ${{ inputs.LANGUAGE == 'python' }}
     uses: ./.github/workflows/java-k8s-e2e-test.yml
     secrets: inherit
     with:
