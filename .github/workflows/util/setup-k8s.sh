@@ -15,34 +15,34 @@ function create_resources() {
     aws ec2 create-key-pair --key-name "${KEY_NAME}" --query 'KeyMaterial' --output text > "${KEY_NAME}.pem"
     chmod 400  "${KEY_NAME}.pem"
 
-#    # Fetch the latest Amazon Linux 2 AMI ID
-#    echo "Fetching Latest Image Id"
-#    image_id=$(aws ec2 describe-images \
-#      --region $REGION \
-#      --owners amazon \
-#      --filters "Name=name,Values=al2023-ami-minimal-*-x86_64" "Name=state,Values=available" \
-#      --query 'Images | sort_by(@, &CreationDate) | [-1].ImageId' \
-#      --output text)
-#
-#    default_vpc_id=$(aws ec2 describe-vpcs --filters Name=isDefault,Values=true --query 'Vpcs[0].VpcId' --output text)
-#    security_group_id=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$default_vpc_id" "Name=group-name,Values=default" --query "SecurityGroups[0].GroupId" --output text)
-#
-#    # Create Master EC2 Instance
-#    echo "Creating Master Instance"
-#    master_instance_id=$(aws ec2 run-instances \
-#      --image-id $image_id \
-#      --count 1 \
-#      --instance-type m5.xlarge \
-#      --key-name $KEY_NAME \
-#      --security-group-ids $security_group_id \
-#      --iam-instance-profile Name=$INSTANCE_PROFILE \
-#      --associate-public-ip-address \
-#      --block-device-mappings 'DeviceName=/dev/xvda,Ebs={VolumeSize=80,VolumeType=gp3}' \
-#      --metadata-options 'HttpPutResponseHopLimit=3,HttpEndpoint=enabled' \
-#      --query 'Instances[0].InstanceId' \
-#      --output text)
-#
-#    aws ec2 create-tags --resources $master_instance_id --tags Key=Name,Value=$MASTER_INSTANCE_NAME Key=k8s-on-ec2-node,Value=true
+    # Fetch the latest Amazon Linux 2 AMI ID
+    echo "Fetching Latest Image Id"
+    image_id=$(aws ec2 describe-images \
+      --region $REGION \
+      --owners amazon \
+      --filters "Name=name,Values=al2023-ami-minimal-*-x86_64" "Name=state,Values=available" \
+      --query 'Images | sort_by(@, &CreationDate) | [-1].ImageId' \
+      --output text)
+
+    default_vpc_id=$(aws ec2 describe-vpcs --filters Name=isDefault,Values=true --query 'Vpcs[0].VpcId' --output text)
+    security_group_id=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$default_vpc_id" "Name=group-name,Values=default" --query "SecurityGroups[0].GroupId" --output text)
+
+    # Create Master EC2 Instance
+    echo "Creating Master Instance"
+    master_instance_id=$(aws ec2 run-instances \
+      --image-id $image_id \
+      --count 1 \
+      --instance-type m5.xlarge \
+      --key-name $KEY_NAME \
+      --security-group-ids $security_group_id \
+      --iam-instance-profile Name=$INSTANCE_PROFILE \
+      --associate-public-ip-address \
+      --block-device-mappings 'DeviceName=/dev/xvda,Ebs={VolumeSize=80,VolumeType=gp3}' \
+      --metadata-options 'HttpPutResponseHopLimit=3,HttpEndpoint=enabled' \
+      --query 'Instances[0].InstanceId' \
+      --output text)
+
+    aws ec2 create-tags --resources $master_instance_id --tags Key=Name,Value=$MASTER_INSTANCE_NAME Key=k8s-on-ec2-node,Value=true
 #
 #    echo "Creating Worker Instance"
 #    worker_instance_id=$(aws ec2 run-instances \

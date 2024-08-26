@@ -86,6 +86,7 @@ jobs:
             --query "Reservations[*].Instances[*].PublicIpAddress" \
             --output text)
           
+#          aws secretsmanager update-secret --secret-id "${SECRET_NAMES[0]}" --secret-string file://$private_key_file
           aws secretsmanager update-secret --secret-id "${SECRET_NAMES[1]}" --secret-string $master_public_ip
 
       - name: Run Java K8s Test
