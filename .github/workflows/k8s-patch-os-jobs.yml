@@ -100,13 +100,14 @@ jobs:
           aws secretsmanager update-secret --secret-id "${SECRET_NAMES[1]}" --secret-string "$private_key_content"
   
   run-java-k8s-test:
-    if: ${{ inputs.LANGUAGE == 'java' }}
+    if: ${{ inputs.LANGUAGE == 'java' || inputs.LANGUAGE == 'all' }}
     needs: create-k8s-on-ec2
     uses: ./.github/workflows/java-k8s-e2e-test.yml
     secrets: inherit
     with:
       aws-region: 'us-east-1'
       caller-workflow-name: 'k8s-os-patching'
+      caller-repository: ${{ env.REPO }}
 
   run-python-k8s-test:
     if: ${{ inputs.LANGUAGE == 'python' }}
@@ -116,6 +117,7 @@ jobs:
     with:
       aws-region: 'us-east-1'
       caller-workflow-name: 'k8s-os-patching'
+      caller-repository: ${{ env.REPO }}
 
   update-secrets:
     needs: [ run-java-k8s-test, run-python-k8s-test ]
@@ -163,7 +165,10 @@ jobs:
           
           endpoint_secret=$(aws secretsmanager get-secret-value --secret-id "${PENDING_SECRET_KEYS[0]}" --query SecretString --output text)
           ssh_secret=$(aws secretsmanager get-secret-value --secret-id "${PENDING_SECRET_KEYS[1]}" --query SecretString --output text)
+          
+          echo $endpoint_secret
+          echo "$ssh_secret"  
 
           aws secretsmanager update-secret --secret-id "${CURRENT_SECRET_KEYS[0]}" --secret-string $endpoint_secret
-          aws secretsmanager update-secret --secret-id "${CURRENT_SECRET_KEYS[1]}" --secret-string $ssh_secret          
+          aws secretsmanager update-secret --secret-id "${CURRENT_SECRET_KEYS[1]}" --secret-string "$ssh_secret"
           
