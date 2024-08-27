@@ -48,7 +48,7 @@ jobs:
       validation-result: ${{ steps.validation-result.outputs.validation-result }}
     steps:
       - name: Generate testing id
-        run: echo TESTING_ID="${{ env.E2E_TEST_AWS_REGION }}-${{ github.run_id }}-${{ github.run_number }}" >> $GITHUB_ENV
+        run: echo TESTING_ID="${{ env.CALLER_REPOSITORY }}-${{ env.E2E_TEST_AWS_REGION }}-${{ github.run_id }}-${{ github.run_number }}" >> $GITHUB_ENV
 
       - uses: actions/checkout@v4
         with:
@@ -74,7 +74,7 @@ jobs:
           role-to-assume: arn:aws:iam::${{ env.E2E_TEST_ACCOUNT_ID }}:role/${{ env.E2E_TEST_ROLE_NAME }}
           aws-region: us-east-1
 
-      - name: Retrieve account
+      - name: Retrieve Secrets
         uses: aws-actions/aws-secretsmanager-get-secrets@v1
         with:
           secret-ids: |

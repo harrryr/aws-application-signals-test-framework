@@ -172,6 +172,9 @@ function install_helm() {
     curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
     chmod 700 get_helm.sh
     ./get_helm.sh && sleep 30
+    sudo yum install wget -y && \
+    sudo wget https://github.com/mikefarah/yq/releases/download/v4.31.2/yq_linux_amd64 -O /usr/bin/yq && \
+    sudo chmod +x /usr/bin/yq
 EOF
 
 }

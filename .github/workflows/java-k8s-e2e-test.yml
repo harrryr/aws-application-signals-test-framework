@@ -48,7 +48,7 @@ jobs:
       validation-result: ${{ steps.validation-result.outputs.validation-result }}
     steps:
       - name: Generate testing id
-        run: echo TESTING_ID="${{ env.E2E_TEST_AWS_REGION }}-${{ github.run_id }}-${{ github.run_number }}" >> $GITHUB_ENV
+        run: echo TESTING_ID="${{ env.CALLER_REPOSITORY }}-${{ env.E2E_TEST_AWS_REGION }}-${{ github.run_id }}-${{ github.run_number }}" >> $GITHUB_ENV
 
       - uses: actions/checkout@v4
         with:
