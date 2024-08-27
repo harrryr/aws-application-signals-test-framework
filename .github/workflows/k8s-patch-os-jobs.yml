@@ -153,7 +153,7 @@ jobs:
         run: |
           PENDING_SECRET_KEYS=(
             "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-master-node-endpoint-pending-value"
-            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-ssh-key-storage-pending-value"
+            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-ssh-key-pending-value"
           )
           
           CURRENT_SECRET_KEYS=(

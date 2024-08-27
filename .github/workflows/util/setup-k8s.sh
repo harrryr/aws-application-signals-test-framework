@@ -147,6 +147,40 @@ function run_k8s_worker() {
     sudo setenforce 0 && sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
     echo -e "[kubernetes]\nname=Kubernetes\nbaseurl=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/\nenabled=1\ngpgcheck=1\ngpgkey=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/repodata/repomd.xml.key\nexclude=kubelet kubeadm kubectl cri-tools kubernetes-cni" | sudo tee /etc/yum.repos.d/kubernetes.repo
 
+    # Path to the RPM lock file
+    lock_file="/var/lib/rpm/.rpm.lock"
+
+    # Number of retries
+    max_retries=100
+
+    # Delay between retries in seconds
+    delay=10
+
+    # Retry counter
+    attempt=0
+
+    # Function to check if the lock is held
+    check_lock() {
+        if fuser "$lock_file" >/dev/null 2>&1; then
+            return 1  # Lock is held
+        else
+            return 0  # Lock is not held
+        fi
+    }
+
+    # Wait for the lock to be released
+    while ! check_lock; do
+        if [ $attempt -lt $max_retries ]; then
+            echo "Lock file is in use. Waiting for $delay seconds..."
+            sleep $delay
+            attempt=$((attempt + 1))
+        else
+            echo "Max retries reached. Lock file is still in use."
+            exit 1
+        fi
+    done
+
+    echo "Lock file is no longer in use. Proceeding with the command."
     sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 
     echo "11"
@@ -188,6 +222,5 @@ EOF
 
 create_resources
 run_k8s_master
-sleep 300
 run_k8s_worker
 install_helm
