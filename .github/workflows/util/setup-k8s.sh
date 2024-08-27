@@ -97,20 +97,7 @@ function run_k8s_master() {
     sudo systemctl restart containerd && sleep 20
     sudo setenforce 0 && sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
     echo -e "[kubernetes]\nname=Kubernetes\nbaseurl=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/\nenabled=1\ngpgcheck=1\ngpgkey=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/repodata/repomd.xml.key\nexclude=kubelet kubeadm kubectl cri-tools kubernetes-cni" | sudo tee /etc/yum.repos.d/kubernetes.repo
-    max_retries=10
-    delay=10
-    attempt=0
-    # Attempt to run the command with retries
-    until sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes; do
-      if [ $attempt -lt $max_retries ]; then
-        echo "Command failed. Retrying in $delay seconds... (Attempt $((attempt+1))/$max_retries)"
-        sleep $delay
-        attempt=$((attempt + 1))
-      else
-        echo "Command failed after $max_retries attempts."
-        exit 1
-      fi
-    done
+    sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
     sudo systemctl enable --now kubelet && sudo systemctl restart kubelet && sleep 30
     sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --apiserver-advertise-address=$master_private_ip --apiserver-cert-extra-sans=$worker_private_ip
     mkdir -p \$HOME/.kube
@@ -160,22 +147,11 @@ function run_k8s_worker() {
     sudo setenforce 0 && sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
     echo -e "[kubernetes]\nname=Kubernetes\nbaseurl=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/\nenabled=1\ngpgcheck=1\ngpgkey=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/repodata/repomd.xml.key\nexclude=kubelet kubeadm kubectl cri-tools kubernetes-cni" | sudo tee /etc/yum.repos.d/kubernetes.repo
 
-    max_retries=10
-    delay=10
-    attempt=0
+    sudo lsof -t /var/lib/rpm/.rpm.lock
+    sudo kill $(sudo lsof -t /var/lib/rpm/.rpm.lock)
 
-    # Attempt to run the command with retries
-    until sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes; do
-      if [ $attempt -lt $max_retries ]; then
-        echo "Command failed. Retrying in $delay seconds... (Attempt $((attempt+1))/$max_retries)"
-        sleep $delay
-        attempt=$((attempt + 1))
-      else
-        echo "Command failed after $max_retries attempts."
-        exit 1
-      fi
-    done
-
+    sleep 60
+    sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
     echo "11"
     sudo mkdir -p /etc/kubernetes/pki/
     echo "12"
