@@ -87,6 +87,22 @@ function run_k8s_master() {
 
   # set up kubeadmin
   ssh -o StrictHostKeyChecking=no -i "${KEY_NAME}.pem" ec2-user@$master_ip << EOF
+    max_retries=10
+    delay=10
+    attempt=0
+
+    # Attempt to run the command with retries
+    until sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes; do
+      if [ $attempt -lt $max_retries ]; then
+        echo "Command failed. Retrying in $delay seconds... (Attempt $((attempt+1))/$max_retries)"
+        sleep $delay
+        attempt=$((attempt + 1))
+      else
+        echo "Command failed after $max_retries attempts."
+        exit 1
+      fi
+    done
+
     sudo yum update -y && sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
     sudo yum install docker tmux git vim -y && sudo usermod -aG docker ec2-user
     sudo systemctl enable docker && sudo systemctl start docker
@@ -147,38 +163,20 @@ function run_k8s_worker() {
     sudo setenforce 0 && sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
     echo -e "[kubernetes]\nname=Kubernetes\nbaseurl=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/\nenabled=1\ngpgcheck=1\ngpgkey=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/repodata/repomd.xml.key\nexclude=kubelet kubeadm kubectl cri-tools kubernetes-cni" | sudo tee /etc/yum.repos.d/kubernetes.repo
 
-    # Number of retries
     max_retries=10
-
-    # Delay between retries in seconds
     delay=10
-
-    # Retry counter
     attempt=0
 
-    # Command to run
-    command="sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes"
-
-    # Function to run the command
-    run_command() {
-        if $command; then
-            echo "Command succeeded."
-            return 0
-        else
-            return 1
-        fi
-    }
-
     # Attempt to run the command with retries
-    until run_command; do
-        if [ $attempt -lt $max_retries ]; then
-            echo "Command failed. Retrying in $delay seconds... (Attempt $((attempt+1))/$max_retries)"
-            sleep $delay
-            attempt=$((attempt + 1))
-        else
-            echo "Command failed after $max_retries attempts."
-            exit 1
-        fi
+    until sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes; do
+      if [ $attempt -lt $max_retries ]; then
+        echo "Command failed. Retrying in $delay seconds... (Attempt $((attempt+1))/$max_retries)"
+        sleep $delay
+        attempt=$((attempt + 1))
+      else
+        echo "Command failed after $max_retries attempts."
+        exit 1
+      fi
     done
 
     echo "11"
