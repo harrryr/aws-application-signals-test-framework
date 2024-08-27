@@ -146,36 +146,14 @@ function run_k8s_worker() {
     sudo systemctl restart containerd
     sudo setenforce 0 && sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
     echo -e "[kubernetes]\nname=Kubernetes\nbaseurl=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/\nenabled=1\ngpgcheck=1\ngpgkey=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/repodata/repomd.xml.key\nexclude=kubelet kubeadm kubectl cri-tools kubernetes-cni" | sudo tee /etc/yum.repos.d/kubernetes.repo
-
-    max_retries=10
-    delay=10
-    attempt=0
-
-    # Attempt to run the command with retries
-    until sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes; do
-      if [ $attempt -lt $max_retries ]; then
-        echo "Command failed. Retrying in $delay seconds... (Attempt $((attempt+1))/$max_retries)"
-        sleep $delay
-        attempt=$((attempt + 1))
-      else
-        echo "Command failed after $max_retries attempts."
-        exit 1
-      fi
-    done
-
-    echo "11"
+    sleep 60
+    sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
     sudo mkdir -p /etc/kubernetes/pki/
-    echo "12"
     sudo cp apiserver.crt /etc/kubernetes/pki/apiserver.crt
-    echo "13"
     sudo cp apiserver.key /etc/kubernetes/pki/apiserver.key
-    echo "14"
     sudo bash join-cluster.sh && sleep 30
-    echo "15"
     echo "tlsCertFile: /etc/kubernetes/pki/apiserver.crt" | sudo tee -a /var/lib/kubelet/config.yaml
-    echo "16"
     echo "tlsPrivateKeyFile: /etc/kubernetes/pki/apiserver.key" | sudo tee -a /var/lib/kubelet/config.yaml
-    echo "17"
     sudo systemctl restart kubelet
 EOF
 
