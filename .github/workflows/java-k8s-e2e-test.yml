@@ -106,8 +106,8 @@ jobs:
           sed -i 's#\${IMAGE}#${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.E2E_TEST_AWS_REGION }}.amazonaws.com/${{ env.JAVA_MAIN_SAMPLE_APP_IMAGE }}#' frontend-service-depl.yaml
           sed -i 's#\${TESTING_ID}#${{ env.TESTING_ID }}#' remote-service-depl.yaml
           sed -i 's#\${IMAGE}#${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.E2E_TEST_AWS_REGION }}.amazonaws.com/${{ env.JAVA_REMOTE_SAMPLE_APP_IMAGE }}#' remote-service-depl.yaml
-          aws s3api put-object --bucket aws-appsignals-sample-app-prod-${{ env.E2E_TEST_AWS_REGION }}-2 --key frontend-service-depl-${{ github.event.repository.name }}.yaml --body frontend-service-depl.yaml
-          aws s3api put-object --bucket aws-appsignals-sample-app-prod-${{ env.E2E_TEST_AWS_REGION }}-2 --key remote-service-depl-${{ github.event.repository.name }}.yaml --body remote-service-depl.yaml
+          aws s3api put-object --bucket aws-appsignals-sample-app-prod-${{ env.E2E_TEST_AWS_REGION }}-2 --key frontend-service-depl-${{ env.TESTING_ID }}.yaml --body frontend-service-depl.yaml
+          aws s3api put-object --bucket aws-appsignals-sample-app-prod-${{ env.E2E_TEST_AWS_REGION }}-2 --key remote-service-depl-${{ env.TESTING_ID }}.yaml --body remote-service-depl.yaml
 
       - name: Set up terraform
         uses: ./.github/workflows/actions/execute_and_retry
@@ -264,6 +264,13 @@ jobs:
         run: |
           terraform destroy -auto-approve \
             -var="test_id=${{ env.TESTING_ID }}"
+
+      - name: Delete deployment files
+        if: always()
+        continue-on-error: true
+        run: |
+          aws s3api delete-object --bucket aws-appsignals-sample-app-prod-${{ env.E2E_TEST_AWS_REGION }}-2 --key frontend-service-depl-${{ env.TESTING_ID }}.yaml
+          aws s3api delete-object --bucket aws-appsignals-sample-app-prod-${{ env.E2E_TEST_AWS_REGION }}-2 --key remote-service-depl-${{ env.TESTING_ID }}.yaml
 
   emit-metric:
     needs: java-k8s
