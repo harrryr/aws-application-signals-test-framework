@@ -48,7 +48,7 @@ jobs:
       validation-result: ${{ steps.validation-result.outputs.validation-result }}
     steps:
       - name: Generate testing id
-        run: echo TESTING_ID="${{ env.E2E_TEST_AWS_REGION }}-${{ github.run_id }}-${{ github.run_number }}" >> $GITHUB_ENV
+        run: echo TESTING_ID="${{ github.run_id }}-${{ github.run_number }}-${RANDOM}" >> $GITHUB_ENV
 
       - uses: actions/checkout@v4
         with:
@@ -149,8 +149,8 @@ jobs:
 
       - name: Get Main and Remote Service IP
         run: |
-          echo MAIN_SERVICE_IP="$(aws ssm get-parameter --region ${{ env.E2E_TEST_AWS_REGION }} --name main-service-ip-java-${{ env.TESTING_ID }} | jq -r '.Parameter.Value')" >> $GITHUB_ENV
-          echo REMOTE_SERVICE_IP="$(aws ssm get-parameter --region ${{ env.E2E_TEST_AWS_REGION }} --name remote-service-ip-java-${{ env.TESTING_ID }} | jq -r '.Parameter.Value')" >> $GITHUB_ENV
+          echo MAIN_SERVICE_IP="$(aws ssm get-parameter --region ${{ env.E2E_TEST_AWS_REGION }} --name main-service-ip-${{ env.TESTING_ID }} | jq -r '.Parameter.Value')" >> $GITHUB_ENV
+          echo REMOTE_SERVICE_IP="$(aws ssm get-parameter --region ${{ env.E2E_TEST_AWS_REGION }} --name remote-service-ip-${{ env.TESTING_ID }} | jq -r '.Parameter.Value')" >> $GITHUB_ENV
 
       - name: Initiate Gradlew Daemon
         if: steps.initiate-gradlew == 'failure'
