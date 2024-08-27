@@ -188,6 +188,6 @@ EOF
 
 create_resources
 run_k8s_master
-sleep 60
+sleep 300
 run_k8s_worker
 install_helm
