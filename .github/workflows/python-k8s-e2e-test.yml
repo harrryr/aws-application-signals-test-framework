@@ -14,6 +14,9 @@ on:
       caller-workflow-name:
         required: true
         type: string
+      caller-repository:
+        required: true
+        type: string
       adot-image-name:
         required: false
         type: string
@@ -28,6 +31,7 @@ permissions:
 env:
   E2E_TEST_AWS_REGION: ${{ inputs.aws-region }}
   CALLER_WORKFLOW_NAME: ${{ inputs.caller-workflow-name }}
+  CALLER_REPOSITORY: ${{ inputs.caller-repository }}
   ADOT_IMAGE_NAME: ${{ inputs.adot-image-name }}
   CW_AGENT_OPERATOR_TAG: ${{ inputs.cw-agent-operator-tag }}
   E2E_TEST_ACCOUNT_ID: ${{ secrets.APPLICATION_SIGNALS_E2E_TEST_ACCOUNT_ID }}
