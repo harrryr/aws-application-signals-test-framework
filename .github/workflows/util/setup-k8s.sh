@@ -243,6 +243,6 @@ EOF
 
 
 create_resources
-#run_k8s_master
+run_k8s_master
 run_k8s_worker
 install_helm
