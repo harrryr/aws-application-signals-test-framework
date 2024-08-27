@@ -147,11 +147,8 @@ function run_k8s_worker() {
     sudo setenforce 0 && sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
     echo -e "[kubernetes]\nname=Kubernetes\nbaseurl=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/\nenabled=1\ngpgcheck=1\ngpgkey=https://pkgs.k8s.io/core:/stable:/v1.29/rpm/repodata/repomd.xml.key\nexclude=kubelet kubeadm kubectl cri-tools kubernetes-cni" | sudo tee /etc/yum.repos.d/kubernetes.repo
 
-    # Path to the RPM lock file
-    lock_file="/var/lib/rpm/.rpm.lock"
-
     # Number of retries
-    max_retries=100
+    max_retries=10
 
     # Delay between retries in seconds
     delay=10
@@ -159,29 +156,30 @@ function run_k8s_worker() {
     # Retry counter
     attempt=0
 
-    # Function to check if the lock is held
-    check_lock() {
-        if fuser "$lock_file" >/dev/null 2>&1; then
-            return 1  # Lock is held
+    # Command to run
+    command="sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes"
+
+    # Function to run the command
+    run_command() {
+        if $command; then
+            echo "Command succeeded."
+            return 0
         else
-            return 0  # Lock is not held
+            return 1
         fi
     }
 
-    # Wait for the lock to be released
-    while ! check_lock; do
+    # Attempt to run the command with retries
+    until run_command; do
         if [ $attempt -lt $max_retries ]; then
-            echo "Lock file is in use. Waiting for $delay seconds..."
+            echo "Command failed. Retrying in $delay seconds... (Attempt $((attempt+1))/$max_retries)"
             sleep $delay
             attempt=$((attempt + 1))
         else
-            echo "Max retries reached. Lock file is still in use."
+            echo "Command failed after $max_retries attempts."
             exit 1
         fi
     done
-
-    echo "Lock file is no longer in use. Proceeding with the command."
-    sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 
     echo "11"
     sudo mkdir -p /etc/kubernetes/pki/
