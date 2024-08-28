@@ -180,4 +180,4 @@ jobs:
     with:
       aws-region: 'us-east-1'
       caller-workflow-name: 'enablement-test-k8s-patch-os'
-      validation-result: ${{ needs.update-secrets.result == 'success' && 'success' || 'failure' }}
+      validation-result: ${{ needs.update-secrets.result }}
