@@ -121,7 +121,7 @@ jobs:
 
   update-secrets:
     needs: [ run-java-k8s-test, run-python-k8s-test ]
-    if: ${{ needs.run-java-k8s-test.result == 'success' || needs.run-python-k8s-test.result == 'success' }}
+    if: ${{ always() && (needs.run-java-k8s-test.result == 'success' || needs.run-python-k8s-test.result == 'success') }}
     runs-on: ubuntu-latest
     steps:
       - name: Configure AWS Credentials
