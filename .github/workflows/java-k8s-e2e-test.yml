@@ -55,9 +55,9 @@ jobs:
           repository: 'harrryr/aws-application-signals-test-framework'
           ref: ${{ env.CALLER_WORKFLOW_NAME == 'main-build' && 'main' || github.ref }}
           fetch-depth: 0
-
-      - name: dfdf
-        run: exit 1
+#
+#      - name: dfdf
+#        run: exit 1
 
 #        # We initialize Gradlew Daemon early on during the workflow because sometimes initialization
 #        # fails due to transient issues. If it fails here, then we will try again later before the validators
