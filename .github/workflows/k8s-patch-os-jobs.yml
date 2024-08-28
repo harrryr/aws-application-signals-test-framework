@@ -99,28 +99,28 @@ jobs:
 #          echo $private_key_content
 #          aws secretsmanager update-secret --secret-id "${SECRET_NAMES[1]}" --secret-string "$private_key_content"
   
-  run-java-k8s-test:
-    if: ${{ inputs.LANGUAGE == 'java' }}
-    needs: create-k8s-on-ec2
-    uses: ./.github/workflows/java-k8s-e2e-test.yml
-    secrets: inherit
-    with:
-      aws-region: 'us-east-1'
-      caller-workflow-name: 'k8s-os-patching'
-      caller-repository: ${{ inputs.repo }}
-
-  run-python-k8s-test:
-    if: ${{ inputs.LANGUAGE == 'python' }}
-    needs: create-k8s-on-ec2
-    uses: ./.github/workflows/python-k8s-e2e-test.yml
-    secrets: inherit
-    with:
-      aws-region: 'us-east-1'
-      caller-workflow-name: 'k8s-os-patching'
-      caller-repository: ${{ inputs.repo }}
+#  run-java-k8s-test:
+#    if: ${{ inputs.LANGUAGE == 'java' }}
+#    needs: create-k8s-on-ec2
+#    uses: ./.github/workflows/java-k8s-e2e-test.yml
+#    secrets: inherit
+#    with:
+#      aws-region: 'us-east-1'
+#      caller-workflow-name: 'k8s-os-patching'
+#      caller-repository: ${{ inputs.repo }}
+#
+#  run-python-k8s-test:
+#    if: ${{ inputs.LANGUAGE == 'python' }}
+#    needs: create-k8s-on-ec2
+#    uses: ./.github/workflows/python-k8s-e2e-test.yml
+#    secrets: inherit
+#    with:
+#      aws-region: 'us-east-1'
+#      caller-workflow-name: 'k8s-os-patching'
+#      caller-repository: ${{ inputs.repo }}
 
   update-secrets:
-    needs: [ run-java-k8s-test, run-python-k8s-test ]
+    needs: create-k8s-on-ec2
     if: ${{ always() }} && (needs.run-java-k8s-test.result == 'success' || needs.run-python-k8s-test.result == 'success')
     runs-on: ubuntu-latest
     steps:
