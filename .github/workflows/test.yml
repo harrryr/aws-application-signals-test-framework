@@ -51,7 +51,6 @@ jobs:
 
   cleanup-k8s-on-ec2:
     runs-on: ubuntu-latest
-    if: ${{ github.event.schedule && startsWith(format('{::yyyy-MM-dd}', now()), format('{::yyyy-MM}-01', now())) }}
     strategy:
       matrix:
         instance: [
@@ -68,6 +67,14 @@ jobs:
       id-token: write
       contents: read
     steps:
+      - name: Check if today is the first day of the month
+        id: check_day
+        run: echo "date=$(( $(date +%d) == 01 ))" >> $GITHUB_OUTPUT
+
+      - name: Run only on the first day of the month
+        if: steps.check_day.outputs.first_day == '1'
+        run: echo "It's the first day of the month!"
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
