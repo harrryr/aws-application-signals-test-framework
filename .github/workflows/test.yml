@@ -69,7 +69,9 @@ jobs:
     steps:
       - name: Check if today is the first day of the month
         id: check_day
-        run: echo "day=$(( $(date +%d) == 01 ))" >> $GITHUB_OUTPUT
+        run: |
+          echo $(( $(date +%d) == 01 ))
+          echo "day=$(( $(date +%d) == 01 ))" >> $GITHUB_OUTPUT
 
       - name: Configure AWS Credentials
         if: steps.check_day.outputs.day == '29'
