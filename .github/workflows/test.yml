@@ -85,7 +85,7 @@ jobs:
           STORAGE_SECRET_KEYS=(
             "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-master-node-endpoint-temporary-storage"
           )
-          endpoint_secret=$(aws secretsmanager get-secret-value --secret-id "${CURRENT_SECRET_KEYS[0]}" --query SecretString --output text)
+          endpoint_secret=$(aws secretsmanager get-secret-value --secret-id "${STORAGE_SECRET_KEYS[0]}" --query SecretString --output text)
           instance_name=$(aws ec2 describe-instances \
             --filters "Name=ip-address,Values=$public_ip" \
             --query "Reservations[*].Instances[*].{Name:Tags[?Key=='Name']|[0].Value}" \
