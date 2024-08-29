@@ -45,17 +45,17 @@ jobs:
           ref: ${{ env.CALLER_WORKFLOW_NAME == 'main-build' && 'main' || github.ref }}
           fetch-depth: 0
 
-      # We initialize Gradlew Daemon early on during the workflow because sometimes initialization
-      # fails due to transient issues. If it fails here, then we will try again later before the validators
-      - name: Initiate Gradlew Daemon
-        id: initiate-gradlew
-        uses: ./.github/workflows/actions/execute_and_retry
-        continue-on-error: true
-        with:
-          command: "./gradlew :validator:build"
-          cleanup: "./gradlew clean"
-          max_retry: 3
-          sleep_time: 60
+#      # We initialize Gradlew Daemon early on during the workflow because sometimes initialization
+#      # fails due to transient issues. If it fails here, then we will try again later before the validators
+#      - name: Initiate Gradlew Daemon
+#        id: initiate-gradlew
+#        uses: ./.github/workflows/actions/execute_and_retry
+#        continue-on-error: true
+#        with:
+#          command: "./gradlew :validator:build"
+#          cleanup: "./gradlew clean"
+#          max_retry: 3
+#          sleep_time: 60
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
