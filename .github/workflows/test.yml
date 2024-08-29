@@ -83,7 +83,7 @@ jobs:
         if: steps.check_day.outputs.is_first_day == '1'
         run: |
           STORAGE_SECRET_KEYS=(
-            "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-master-node-endpoint-temporary-storage"
+            "e2e-test/${{ matrix.instance.repo_name }}/${{ matrix.instance.language }}-k8s-master-node-endpoint-temporary-storage"
           )
           endpoint_secret=$(aws secretsmanager get-secret-value --secret-id "${STORAGE_SECRET_KEYS[0]}" --query SecretString --output text)
           instance_name=$(aws ec2 describe-instances \
