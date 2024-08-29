@@ -74,14 +74,14 @@ jobs:
           echo "day=$(( $(date +%d) == 29 ))" >> $GITHUB_OUTPUT
 
       - name: Configure AWS Credentials
-        if: steps.check_day.outputs.day == '29'
+        if: steps.check_day.outputs.day
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::${{ env.E2E_TEST_ACCOUNT_ID }}:role/${{ env.E2E_TEST_ROLE_NAME }}
           aws-region: us-east-1
 
       - name: Delete Key Pair and EC2 Instance
-        if: steps.check_day.outputs.day == '29'
+        if: steps.check_day.outputs.day
         run: |
           STORAGE_SECRET_KEYS=(
             "e2e-test/${{ env.REPO }}/${{ env.LANGUAGE }}-k8s-master-node-endpoint-temporary-storage"
