@@ -71,7 +71,7 @@ jobs:
         id: check_day
         run: |
           echo $(( $(date +%d) == 01 ))
-          echo "day=$(( $(date +%d) == 01 ))" >> $GITHUB_OUTPUT
+          echo "day=$(( $(date +%d) == 29 ))" >> $GITHUB_OUTPUT
 
       - name: Configure AWS Credentials
         if: steps.check_day.outputs.day == '29'
