@@ -87,7 +87,7 @@ jobs:
           )
           endpoint_secret=$(aws secretsmanager get-secret-value --secret-id "${STORAGE_SECRET_KEYS[0]}" --query SecretString --output text)
           instance_name=$(aws ec2 describe-instances \
-            --filters "Name=ip-address,Values=$public_ip" \
+            --filters "Name=ip-address,Values=$endpoint_secret" \
             --query "Reservations[*].Instances[*].{Name:Tags[?Key=='Name']|[0].Value}" \
             --output text)
           echo $instance_name
