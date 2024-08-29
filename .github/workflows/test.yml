@@ -90,6 +90,7 @@ jobs:
             --filters "Name=ip-address,Values=$public_ip" \
             --query "Reservations[*].Instances[*].{Name:Tags[?Key=='Name']|[0].Value}" \
             --output text)
+          echo $instance_name
           prev_testing_id=$(echo $instance_name | awk -F'-' '{print $(NF-1)"-"$NF}')
           
           aws ec2 delete-key-pair --key-name "k8s-on-ec2-${{ matrix.instance.ec2_name }}-${{ matrix.instance.language }}-key-pair-$prev_testing_id"
