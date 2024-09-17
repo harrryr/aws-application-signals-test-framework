@@ -23,8 +23,8 @@ plugins {
 
 group = "com.amazon.sampleapp"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_11
-java.targetCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_22
+java.targetCompatibility = JavaVersion.VERSION_22
 
 repositories {
   mavenCentral()
