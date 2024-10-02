@@ -1,0 +1,86 @@
+## Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+## SPDX-License-Identifier: Apache-2.0
+
+## This workflow aims to run the Application Signals end-to-end tests as a canary to
+## test the artifacts for App Signals enablement. It will deploy a sample app and remote
+## service onto an EKS cluster, call the APIs, and validate the generated telemetry,
+## including logs, metrics, and traces.
+name: Java EKS Enablement Canary Testing
+on:
+  schedule:
+    - cron: '*/15 * * * *' # run the workflow every 15 minutes
+  workflow_dispatch: # be able to run the workflow on demand
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  eks-8:
+    strategy:
+      fail-fast: false
+      matrix:
+        aws-region: ['us-east-1']
+    uses: ./.github/workflows/java-eks-retry.yml
+    secrets: inherit
+    with:
+      aws-region: ${{ matrix.aws-region }}
+      test-cluster-name: 'e2e-canary-test'
+      caller-workflow-name: 'appsignals-e2e-eks-canary-test'
+      java-version: '8'
+
+  eks-11:
+    needs: eks-8
+    strategy:
+      fail-fast: false
+      matrix:
+        aws-region: ['us-east-1']
+    uses: ./.github/workflows/java-eks-retry.yml
+    secrets: inherit
+    with:
+      aws-region: ${{ matrix.aws-region }}
+      test-cluster-name: 'e2e-canary-test'
+      caller-workflow-name: 'appsignals-e2e-eks-canary-test'
+      java-version: '11'
+
+  eks-17:
+    needs: eks-11
+    strategy:
+      fail-fast: false
+      matrix:
+        aws-region: ['us-east-1']
+    uses: ./.github/workflows/java-eks-retry.yml
+    secrets: inherit
+    with:
+      aws-region: ${{ matrix.aws-region }}
+      test-cluster-name: 'e2e-canary-test'
+      caller-workflow-name: 'appsignals-e2e-eks-canary-test'
+      java-version: '17'
+
+  eks-21:
+    needs: eks-17
+    strategy:
+      fail-fast: false
+      matrix:
+        aws-region: ['us-east-1']
+    uses: ./.github/workflows/java-eks-retry.yml
+    secrets: inherit
+    with:
+      aws-region: ${{ matrix.aws-region }}
+      test-cluster-name: 'e2e-canary-test'
+      caller-workflow-name: 'appsignals-e2e-eks-canary-test'
+      java-version: '21'
+
+  eks-22:
+    needs: eks-21
+    strategy:
+      fail-fast: false
+      matrix:
+        aws-region: ['us-east-1']
+    uses: ./.github/workflows/java-eks-retry.yml
+    secrets: inherit
+    with:
+      aws-region: ${{ matrix.aws-region }}
+      test-cluster-name: 'e2e-canary-test'
+      caller-workflow-name: 'appsignals-e2e-eks-canary-test'
+      java-version: '22'
