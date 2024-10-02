@@ -7,8 +7,7 @@
 # testing ADOT Java
 name: Sample App Deployment - Java ECR
 on:
-  workflow_dispatch: # be able to run the workflow on demand
-
+  push:
 permissions:
   id-token: write
   contents: read
@@ -22,10 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        aws-region: [ 'af-south-1','ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-south-2','ap-southeast-1',
-                      'ap-southeast-2','ap-southeast-3','ap-southeast-4','ca-central-1','eu-central-1','eu-central-2','eu-north-1',
-                      'eu-south-1','eu-south-2','eu-west-1','eu-west-2','eu-west-3','il-central-1','me-central-1','me-south-1', 'sa-east-1',
-                      'us-east-1','us-east-2','us-west-1','us-west-2' ]
+        aws-region: [ 'us-east-1' ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -61,10 +57,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        aws-region: [ 'af-south-1','ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-south-2','ap-southeast-1',
-                      'ap-southeast-2','ap-southeast-3','ap-southeast-4','ca-central-1','eu-central-1','eu-central-2','eu-north-1',
-                      'eu-south-1','eu-south-2','eu-west-1','eu-west-2','eu-west-3','il-central-1','me-central-1','me-south-1', 'sa-east-1',
-                      'us-east-1','us-east-2','us-west-1','us-west-2' ]
+        aws-region: [ 'us-east-1' ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -125,6 +118,14 @@ jobs:
       - name: Build and Upload Main Service Image
         working-directory: sample-apps/java/springboot-main-service
         run: |
+          # For Java 8, springboot must be lower than version 3
+          # For Java 11,17,21, they are compatible with both springboot version
+          # For Java 22 and above, springboot must be version 3 or higher
+          if [ "${{ matrix.java-version }}" = "22" ]; then
+            sed -i 's/id("org.springframework.boot")/id("org.springframework.boot") version "3.3.4"/' build.gradle.kts
+            cat build.gradle.kts
+          fi
+          
           sed -i 's#"{{ECR_IMAGE_URI}}"#"${{ env.E2E_TEST_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/${{ env.JAVA_MAIN_SAMPLE_APP_IMAGE }}:v${{ matrix.java-version }}"#g' build.gradle.kts
           gradle jib -P javaVersion=${{ matrix.java-version }}
 
@@ -157,5 +158,13 @@ jobs:
       - name: Build and Upload Remote Service Image
         working-directory: sample-apps/java/springboot-remote-service
         run: |
+          # For Java 8, springboot must be lower than version 3
+          # For Java 11,17,21, they are compatible with both springboot version
+          # For Java 22 and above, springboot must be version 3 or higher
+          if [ "${{ matrix.java-version }}" = "22" ]; then
+            sed -i 's/id("org.springframework.boot")/id("org.springframework.boot") version "3.3.4"/' build.gradle.kts
+            cat build.gradle.kts
+          fi
+          
           sed -i 's#"{{ECR_IMAGE_URI}}"#"${{ env.E2E_TEST_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/${{ env.JAVA_REMOTE_SAMPLE_APP_IMAGE }}:v${{ matrix.java-version }}"#g' build.gradle.kts
           gradle jib -P javaVersion=${{ matrix.java-version }}
