@@ -8,7 +8,6 @@
 name: Sample App Deployment - Java ECR
 on:
   workflow_dispatch:
-  push:
 
 permissions:
   id-token: write

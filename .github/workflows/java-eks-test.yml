@@ -442,6 +442,7 @@ jobs:
           --rollup'
 
       - name: test
+        continue-on-error: true
         run: sleep 500
 
       - name: Refresh AWS Credentials

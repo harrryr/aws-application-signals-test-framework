@@ -43,6 +43,7 @@ jobs:
       caller-workflow-name: 'appsignals-e2e-eks-canary-test'
       java-version: '11'
 
+
   eks-17:
     needs: eks-11
     strategy:
