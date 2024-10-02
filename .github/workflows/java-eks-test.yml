@@ -441,6 +441,9 @@ jobs:
           --query-string ip=${{ env.REMOTE_SERVICE_POD_IP }}&testingId=${{ env.TESTING_ID }}
           --rollup'
 
+      - name: test
+        run: sleep 500
+
       - name: Refresh AWS Credentials
         if: ${{ github.event.repository.name == 'aws-application-signals-test-framework' }}
         uses: aws-actions/configure-aws-credentials@v4

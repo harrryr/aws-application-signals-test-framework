@@ -8,6 +8,7 @@
 name: Sample App Deployment - Java ECR
 on:
   workflow_dispatch:
+  push:
 
 permissions:
   id-token: write
@@ -18,83 +19,11 @@ env:
   E2E_TEST_ROLE_NAME: ${{ secrets.APPLICATION_SIGNALS_E2E_TEST_ROLE_NAME }}
 
 jobs:
-  java-v11-main:
-    strategy:
-      fail-fast: false
-      matrix:
-        aws-region: [ 'us-east-1' ]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::${{ env.E2E_TEST_ACCOUNT_ID }}:role/${{ env.E2E_TEST_ROLE_NAME }}
-          aws-region: us-east-1
-
-      - name: Retrieve account
-        uses: aws-actions/aws-secretsmanager-get-secrets@v1
-        with:
-          secret-ids: |
-            ACCOUNT_ID, region-account/${{ matrix.aws-region }}
-            JAVA_MAIN_SAMPLE_APP_IMAGE, e2e-test/java-main-sample-app-image
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::${{ env.ACCOUNT_ID }}:role/${{ env.E2E_TEST_ROLE_NAME }}
-          aws-region: ${{ matrix.aws-region }}
-
-      - name: Build and Upload Main Service Image
-        working-directory: sample-apps/java/springboot-main-service
-        run: |
-          sed -i 's#"{{ECR_IMAGE_URI}}"#"${{ env.ACCOUNT_ID }}.dkr.ecr.${{ matrix.aws-region }}.amazonaws.com/${{ env.JAVA_MAIN_SAMPLE_APP_IMAGE }}:v11"#g' build.gradle.kts
-          gradle jib -P javaVersion=11
-
-  java-v11-remote:
-    strategy:
-      fail-fast: false
-      matrix:
-        aws-region: [ 'us-east-1' ]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::${{ env.E2E_TEST_ACCOUNT_ID }}:role/${{ env.E2E_TEST_ROLE_NAME }}
-          aws-region: us-east-1
-
-      - name: Retrieve account
-        uses: aws-actions/aws-secretsmanager-get-secrets@v1
-        with:
-          secret-ids: |
-            ACCOUNT_ID, region-account/${{ matrix.aws-region }}
-            JAVA_REMOTE_SAMPLE_APP_IMAGE, e2e-test/java-remote-sample-app-image
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::${{ env.ACCOUNT_ID }}:role/${{ env.E2E_TEST_ROLE_NAME }}
-          aws-region: ${{ matrix.aws-region }}
-
-      - name: Build and Upload Remote Service Image
-        working-directory: sample-apps/java/springboot-remote-service
-        run: |
-          sed -i 's#"{{ECR_IMAGE_URI}}"#"${{ env.ACCOUNT_ID }}.dkr.ecr.${{ matrix.aws-region }}.amazonaws.com/${{ env.JAVA_REMOTE_SAMPLE_APP_IMAGE }}:v11"#g' build.gradle.kts
-          gradle jib -P javaVersion=11
-
   java-main:
     strategy:
       fail-fast: false
       matrix:
-        java-version: [ '8', '17', '21', '22' ]
+        java-version: [ '8' ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -134,7 +63,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java-version: [ '8', '17', '21', '22' ]
+        java-version: [ '8' ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
