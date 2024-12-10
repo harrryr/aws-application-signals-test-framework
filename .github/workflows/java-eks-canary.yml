@@ -10,7 +10,6 @@ on:
   schedule:
     - cron: '8,33 * * * *' # run the workflow at 8th and 33th minute of every hour
   workflow_dispatch: # be able to run the workflow on demand
-  push:
 
 permissions:
   id-token: write
@@ -30,4 +29,3 @@ jobs:
       caller-workflow-name: 'appsignals-e2e-eks-canary-test'
       java-version: '11'
 
-      
