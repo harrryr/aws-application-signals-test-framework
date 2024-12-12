@@ -4,6 +4,7 @@
 name: Sample App Deployment - Python S3
 on:
   workflow_dispatch: # be able to run the workflow on demand
+  push:
 
 permissions:
   id-token: write
@@ -18,10 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        aws-region: [ 'af-south-1','ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-south-2','ap-southeast-1',
-                      'ap-southeast-2','ap-southeast-3','ap-southeast-4','ca-central-1','eu-central-1','eu-central-2','eu-north-1',
-                      'eu-south-1','eu-south-2','eu-west-1','eu-west-2','eu-west-3','il-central-1','me-central-1','me-south-1', 'sa-east-1',
-                      'us-east-1','us-east-2', 'us-west-1', 'us-west-2' ]
+        aws-region: [ 'us-east-1' ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -52,7 +50,7 @@ jobs:
 
       - name: Upload to S3
         working-directory: sample-apps/python
-        run: aws s3api put-object --bucket ${{ secrets.APP_SIGNALS_E2E_EC2_JAR }}-prod-${{ matrix.aws-region }} --body ./python-sample-app.zip --key python-sample-app.zip
+        run: aws s3api put-object --bucket ${{ secrets.APP_SIGNALS_E2E_EC2_JAR }}-prod-${{ matrix.aws-region }}-2 --body ./python-sample-app.zip --key python-sample-app.zip
 
       - name: Build Lambda Sample App
         uses: actions/checkout@v4
@@ -65,5 +63,5 @@ jobs:
 
       - name: Upload to Lambda Sample App to S3
         working-directory: lambda-layer/sample-apps
-        run: aws s3api put-object --bucket ${{ secrets.APP_SIGNALS_E2E_EC2_JAR }}-prod-${{ matrix.aws-region }} --body ./build/function.zip --key pyfunction.zip
+        run: aws s3api put-object --bucket ${{ secrets.APP_SIGNALS_E2E_EC2_JAR }}-prod-${{ matrix.aws-region }}-2 --body ./build/function.zip --key pyfunction.zip
 
