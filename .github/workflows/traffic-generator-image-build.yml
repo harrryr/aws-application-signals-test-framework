@@ -4,8 +4,6 @@ name: Create and Push Traffic Generator
 
 on:
   workflow_dispatch:
-  push:
-
 
 permissions:
   id-token: write
