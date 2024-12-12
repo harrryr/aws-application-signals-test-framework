@@ -191,6 +191,12 @@ jobs:
           echo MAIN_SAMPLE_APP_IMAGE_ARN="${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.E2E_TEST_AWS_REGION }}.amazonaws.com/${{ env.JAVA_MAIN_SAMPLE_APP_IMAGE }}:v${{ env.JAVA_VERSION }}" >> $GITHUB_ENV
           echo REMOTE_SAMPLE_APP_IMAGE_ARN="${{ env.ACCOUNT_ID }}.dkr.ecr.${{ env.E2E_TEST_AWS_REGION }}.amazonaws.com/${{ env.JAVA_REMOTE_SAMPLE_APP_IMAGE }}:v${{ env.JAVA_VERSION }}" >> $GITHUB_ENV
 
+
+      - name: Temp
+        run: |
+          cd ${{ env.TEST_RESOURCES_FOLDER }}/enablement-script
+          sed -i -e 's#https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml#https://github.com/open-telemetry/opentelemetry-operator/releases/download/v0.114.1/opentelemetry-operator.yaml#g' ./install-otel-operator.sh
+
       - name: Install OTel Operator using enablement script
         uses: ./.github/workflows/actions/execute_and_retry
         with:
