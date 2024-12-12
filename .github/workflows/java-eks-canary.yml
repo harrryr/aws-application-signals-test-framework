@@ -7,9 +7,10 @@
 ## including logs, metrics, and traces.
 name: Java EKS Enablement Canary Testing
 on:
-  schedule:
-    - cron: '8,33 * * * *' # run the workflow at 8th and 33th minute of every hour
+  # schedule:
+  #   - cron: '8,33 * * * *' # run the workflow at 8th and 33th minute of every hour
   workflow_dispatch: # be able to run the workflow on demand
+  push:
 
 permissions:
   id-token: write
@@ -25,7 +26,7 @@ jobs:
     secrets: inherit
     with:
       aws-region: ${{ matrix.aws-region }}
-      test-cluster-name: 'e2e-canary-test'
+      test-cluster-name: 'e2e-playground'
       caller-workflow-name: 'appsignals-e2e-eks-canary-test'
       java-version: '11'
 
