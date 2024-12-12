@@ -6,7 +6,6 @@
 name: Sample App Deployment - Java S3
 on:
   workflow_dispatch: # be able to run the workflow on demand
-  push:
 
 permissions:
   id-token: write
