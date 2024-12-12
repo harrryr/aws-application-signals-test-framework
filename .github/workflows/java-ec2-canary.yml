@@ -39,3 +39,12 @@ jobs:
       otel-source: 'maven'
       java-version: '11'
       cpu-architecture: 'x86_64'
+
+  asg:
+    uses: ./.github/workflows/java-ec2-asg-test.yml
+    secrets: inherit
+    with:
+      aws-region: 'us-east-1'
+      caller-workflow-name: 'appsignals-e2e-ec2-maven-canary-test'
+      java-version: '11'
+      cpu-architecture: 'x86_64'
