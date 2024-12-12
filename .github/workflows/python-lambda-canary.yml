@@ -27,6 +27,3 @@ jobs:
       caller-workflow-name: 'appsignals-python-e2e-lambda-canary-test'
       python-version: '3.12'
       cpu-architecture: 'x86_64'
-
-
-      
