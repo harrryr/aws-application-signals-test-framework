@@ -73,18 +73,6 @@ jobs:
           ref: admin-downgrade
           fetch-depth: 0
 
-        # We initialize Gradlew Daemon early on during the workflow because sometimes initialization
-        # fails due to transient issues. If it fails here, then we will try again later before the validators
-      - name: Initiate Gradlew Daemon
-        id: initiate-gradlew
-        uses: ./.github/workflows/actions/execute_and_retry
-        continue-on-error: true
-        with:
-          command: "./gradlew :validator:build"
-          cleanup: "./gradlew clean"
-          max_retry: 3
-          sleep_time: 60
-
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -170,7 +158,6 @@ jobs:
           echo REMOTE_SERVICE_IP="$(aws ssm get-parameter --region ${{ env.E2E_TEST_AWS_REGION }} --name remote-service-ip-${{ env.TESTING_ID }} | jq -r '.Parameter.Value')" >> $GITHUB_ENV
 
       - name: Initiate Gradlew Daemon
-        if: steps.initiate-gradlew == 'failure'
         uses: ./.github/workflows/actions/execute_and_retry
         continue-on-error: true
         with:

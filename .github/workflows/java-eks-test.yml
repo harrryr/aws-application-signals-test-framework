@@ -74,18 +74,6 @@ jobs:
           ref: admin-downgrade
           fetch-depth: 0
 
-        # We initialize Gradlew Daemon early on during the workflow because sometimes initialization
-        # fails due to transient issues. If it fails here, then we will try again later before the validators
-      - name: Initiate Gradlew Daemon
-        id: initiate-gradlew
-        uses: ./.github/workflows/actions/execute_and_retry
-        continue-on-error: true
-        with:
-          command: "./gradlew :validator:build"
-          cleanup: "./gradlew clean"
-          max_retry: 3
-          sleep_time: 60
-
       - name: Download enablement script
         uses: ./.github/workflows/actions/execute_and_retry
         with:
@@ -375,9 +363,7 @@ jobs:
           sleep_time: 30
 
       - name: Initiate Gradlew Daemon
-        if: steps.initiate-gradlew == 'failure'
         uses: ./.github/workflows/actions/execute_and_retry
-        continue-on-error: true
         with:
           command: "./gradlew :validator:build"
           cleanup: "./gradlew clean"
