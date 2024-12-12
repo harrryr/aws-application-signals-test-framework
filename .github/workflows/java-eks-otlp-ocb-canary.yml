@@ -11,6 +11,7 @@ on:
   schedule:
     - cron: '12,37 * * * *' # run the workflow at 12th and 37th minute of every hour
   workflow_dispatch: # be able to run the workflow on demand
+  push:
 
 permissions:
   id-token: write
@@ -31,6 +32,6 @@ jobs:
     secrets: inherit
     with:
       aws-region: ${{ matrix.aws-region }}
-      test-cluster-name: 'e2e-java-otlp-ocb-canary-test'
+      test-cluster-name: 'e2e-playground'
       caller-workflow-name: 'appsignals-java-e2e-eks-otlp-ocb-canary-test'
       java-version: '11'

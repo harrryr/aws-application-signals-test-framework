@@ -51,7 +51,7 @@ env:
   E2E_TEST_ROLE_NAME: ${{ secrets.APPLICATION_SIGNALS_E2E_TEST_ROLE_NAME }}
   METRIC_NAMESPACE: ApplicationSignals
   LOG_GROUP_NAME: /aws/application-signals/data
-  SAMPLE_APP_ZIP: s3://aws-appsignals-sample-app-prod-${{ inputs.aws-region }}/pyfunction.zip
+  SAMPLE_APP_ZIP: s3://aws-appsignals-sample-app-prod-${{ inputs.aws-region }}-2/pyfunction.zip
   TEST_RESOURCES_FOLDER: ${GITHUB_WORKSPACE}
   STAGING_S3_BUCKET: ${{ secrets.STAGING_BUCKET_NAME }}
   IS_CANARY: false
@@ -70,8 +70,8 @@ jobs:
 
       - uses: actions/checkout@v4
         with:
-          repository: 'aws-observability/aws-application-signals-test-framework'
-          ref: ${{ env.CALLER_WORKFLOW_NAME == 'main-build' && 'main' || github.ref }}
+          repository: 'harrryr/aws-application-signals-test-framework'
+          ref: admin-downgrade
           fetch-depth: 0
 
         # We initialize Gradlew Daemon early on during the workflow because sometimes initialization
