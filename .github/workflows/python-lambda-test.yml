@@ -234,4 +234,5 @@ jobs:
           -var="layer_artifacts_directory=${{ env.ARTIFACTS_DIR }}" \
           -var="region=${{ env.E2E_TEST_AWS_REGION }}" \
           -var="is_canary=${{ env.IS_CANARY }}"
+
           
