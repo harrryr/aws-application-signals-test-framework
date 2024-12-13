@@ -9,8 +9,9 @@ on:
   schedule:
     - cron: '0,25 * * * *' # run the workflow at 0th and 25th minute of every hour
   workflow_dispatch: # be able to run the workflow on demand
+  push:
 
-  
+
 permissions:
   id-token: write
   contents: read
