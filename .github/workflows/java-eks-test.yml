@@ -252,27 +252,27 @@ jobs:
               echo "Terraform deployment was unsuccessful. Will attempt to retry deployment."
             fi
 
-            # If the deployment_failed is still 0, then the terraform deployment succeeded and now try to connect to the endpoint 
-            # after installing App Signals. Attempts to connect will be made for up to 10 minutes
-            if [ $deployment_failed -eq 0 ]; then
-              . ${{ env.TEST_RESOURCES_FOLDER }}/.github/workflows/util/execute_and_retry.sh
-              execute_and_retry 3 \
-              "${{ env.TEST_RESOURCES_FOLDER }}/enablement-script/enable-app-signals.sh \
-              ${{ env.CLUSTER_NAME }} \
-              ${{ env.E2E_TEST_AWS_REGION }} \
-              ${{ env.SAMPLE_APP_NAMESPACE }}" \
-              "${{ env.TEST_RESOURCES_FOLDER }}/enablement-script/clean-app-signals.sh \
-              ${{ env.CLUSTER_NAME }} \
-              ${{ env.E2E_TEST_AWS_REGION }} \
-              ${{ env.SAMPLE_APP_NAMESPACE }} && \
-              aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region ${{ env.E2E_TEST_AWS_REGION }}" \
-              60
+            # # If the deployment_failed is still 0, then the terraform deployment succeeded and now try to connect to the endpoint 
+            # # after installing App Signals. Attempts to connect will be made for up to 10 minutes
+            # if [ $deployment_failed -eq 0 ]; then
+            #   . ${{ env.TEST_RESOURCES_FOLDER }}/.github/workflows/util/execute_and_retry.sh
+            #   execute_and_retry 3 \
+            #   "${{ env.TEST_RESOURCES_FOLDER }}/enablement-script/enable-app-signals.sh \
+            #   ${{ env.CLUSTER_NAME }} \
+            #   ${{ env.E2E_TEST_AWS_REGION }} \
+            #   ${{ env.SAMPLE_APP_NAMESPACE }}" \
+            #   "${{ env.TEST_RESOURCES_FOLDER }}/enablement-script/clean-app-signals.sh \
+            #   ${{ env.CLUSTER_NAME }} \
+            #   ${{ env.E2E_TEST_AWS_REGION }} \
+            #   ${{ env.SAMPLE_APP_NAMESPACE }} && \
+            #   aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region ${{ env.E2E_TEST_AWS_REGION }}" \
+            #   60
                     
-              aws eks update-kubeconfig --region ${{ env.E2E_TEST_AWS_REGION }} --name ${{ env.CLUSTER_NAME }}
+            #   aws eks update-kubeconfig --region ${{ env.E2E_TEST_AWS_REGION }} --name ${{ env.CLUSTER_NAME }}
           
-              execute_and_retry 2 "kubectl delete pods --all -n ${{ env.SAMPLE_APP_NAMESPACE }}" "" 60
-              execute_and_retry 2 "kubectl wait --for=condition=Ready --request-timeout '5m' pod --all -n ${{ env.SAMPLE_APP_NAMESPACE }}" "" 10
-            fi
+            #   execute_and_retry 2 "kubectl delete pods --all -n ${{ env.SAMPLE_APP_NAMESPACE }}" "" 60
+            #   execute_and_retry 2 "kubectl wait --for=condition=Ready --request-timeout '5m' pod --all -n ${{ env.SAMPLE_APP_NAMESPACE }}" "" 10
+            # fi
           
             # If the deployment_failed is 1 then either the terraform deployment or the endpoint connection failed, so first destroy the
             # resources created from terraform and try again.
@@ -308,6 +308,9 @@ jobs:
               exit 1
             fi
           done
+
+      - name: Sleep
+        run: sleep 10000
 
       - name: Get ECR to Patch
         run: |
